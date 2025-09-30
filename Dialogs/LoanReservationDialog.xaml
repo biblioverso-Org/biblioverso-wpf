@@ -5,125 +5,117 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
              MinWidth="540" MaxWidth="720" MaxHeight="520">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <!-- Conserva tus estilos base (no obliga a colores) -->
-        <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <Border Padding="22"
+    <Border Padding="22"
           Background="{DynamicResource App.CardBrush}"
           BorderBrush="{DynamicResource App.BorderBrush}"
           BorderThickness="1"
           CornerRadius="10">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-      <!-- Título -->
-      <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-        <mah:PackIconMaterial Kind="BookCheckOutline"
+            <!-- Título -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                <mah:PackIconMaterial Kind="BookCheckOutline"
                               Width="20" Height="20" Margin="0,0,8,0"
                               Foreground="{DynamicResource App.PrimaryBrush}"/>
-        <TextBlock Text="Realizar préstamo"
+                <TextBlock Text="Realizar préstamo"
                    FontSize="20" FontWeight="SemiBold"
                    Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-      </StackPanel>
+            </StackPanel>
 
-      <!-- Cuerpo -->
-      <Grid Grid.Row="1">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="2*"/>
-          <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
+            <!-- Cuerpo -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Resumen -->
-        <Border Grid.Column="0" Margin="0,0,12,0" Padding="12"
+                <!-- Resumen -->
+                <Border Grid.Column="0" Margin="0,0,12,0" Padding="12"
                 Background="{DynamicResource App.ElevatedBrush}"
                 BorderBrush="{DynamicResource App.BorderBrush}"
                 BorderThickness="1" CornerRadius="10">
-          <StackPanel>
-            <TextBlock Text="{Binding Reservation.BookTitle}"
+                    <StackPanel>
+                        <TextBlock Text="{Binding Reserva.Libro.Titulo}"
                        FontWeight="SemiBold" FontSize="14"
                        Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            <TextBlock Text="{Binding Reservation.MemberName}"
+                        <TextBlock Text="{Binding Reserva.Usuario.NombreCompleto}"
                        Foreground="{DynamicResource App.TextSecondaryBrush}"
                        Margin="0,2,0,6"/>
 
-            <DockPanel Margin="0,6,0,0">
-              <TextBlock Text="Código:" FontWeight="SemiBold" Width="70"
+                        <DockPanel Margin="0,6,0,0">
+                            <TextBlock Text="Código:" FontWeight="SemiBold" Width="70"
                          Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Reservation.Code}"
+                            <TextBlock Text="{Binding Reserva.IdReserva}"
                          Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </DockPanel>
+                        </DockPanel>
 
-            <DockPanel Margin="0,2,0,0">
-              <TextBlock Text="Reserva:" FontWeight="SemiBold" Width="70"
+                        <DockPanel Margin="0,2,0,0">
+                            <TextBlock Text="Reserva:" FontWeight="SemiBold" Width="70"
                          Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Reservation.StartDate, StringFormat={}{0:dd/MM/yyyy}}"
+                            <TextBlock Text="{Binding Reserva.FechaReserva, StringFormat={}{0:dd/MM/yyyy}}"
                          Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </DockPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
 
-            <DockPanel Margin="0,2,0,0">
-              <TextBlock Text="Límite:" FontWeight="SemiBold" Width="70"
-                         Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Reservation.DueDate, StringFormat={}{0:dd/MM/yyyy}}"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </DockPanel>
-          </StackPanel>
-        </Border>
-
-        <!-- Formulario -->
-        <StackPanel Grid.Column="1">
-          <DatePicker Margin="0,0,0,10"
+                <!-- Formulario -->
+                <StackPanel Grid.Column="1">
+                    <DatePicker Margin="0,0,0,10"
                       materialDesign:HintAssist.Hint="Fecha de préstamo"
                       SelectedDate="{Binding LoanStart, Mode=TwoWay}"/>
 
-          <DatePicker Margin="0,0,0,10"
+                    <DatePicker Margin="0,0,0,10"
                       materialDesign:HintAssist.Hint="Fecha de devolución"
                       SelectedDate="{Binding DueDate, Mode=TwoWay}"/>
 
-          <TextBox Margin="0,0,0,10"
+                    <TextBox Margin="0,0,0,10"
                    materialDesign:HintAssist.Hint="Observaciones (opcional)"
                    Text="{Binding Notes}"
                    AcceptsReturn="True" Height="90" TextWrapping="Wrap"/>
 
-          <StackPanel Orientation="Horizontal">
-            <CheckBox IsChecked="{Binding ResetFine}" VerticalAlignment="Center"/>
-            <TextBlock Text="Reiniciar multa a 0"
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding ResetFine}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Reiniciar multa a 0"
                        VerticalAlignment="Center" Margin="6,0,0,0"
                        Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-          </StackPanel>
-        </StackPanel>
-      </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
 
-      <!-- Footer -->
-      <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,16,0,0">
-        <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+            <!-- Footer -->
+            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,16,0,0">
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 CommandParameter="{x:Null}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Cancelar"/>
-          </StackPanel>
-        </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
 
-        <Button DockPanel.Dock="Right"
+                <Button DockPanel.Dock="Right"
                 IsEnabled="{Binding IsValid}"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 CommandParameter="{Binding}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="CheckBold" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Confirmar préstamo"/>
-          </StackPanel>
-        </Button>
-      </DockPanel>
-    </Grid>
-  </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="CheckBold" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Confirmar préstamo"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Grid>
+    </Border>
 </UserControl>

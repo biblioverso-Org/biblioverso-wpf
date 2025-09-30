@@ -6,177 +6,155 @@
              xmlns:converters="clr-namespace:library.Converters"
              MinWidth="560" MaxWidth="720" MaxHeight="525">
 
-  <!-- Recursos -->
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <!-- (opcional) reusa estilos compartidos; los colores vendrán del theme -->
-        <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <converters:SafeImageSourceConverter x:Key="SafeImg"/>
-    </ResourceDictionary>
-  </UserControl.Resources>
+    <!-- Recursos -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:SafeImageSourceConverter x:Key="SafeImg"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <Border Padding="24"
+    <Border Padding="24"
           Background="{DynamicResource App.CardBrush}"
           BorderBrush="{DynamicResource App.BorderBrush}"
           BorderThickness="1"
           CornerRadius="10">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-      <!-- Título -->
-      <TextBlock Grid.Row="0"
+            <!-- Título -->
+            <TextBlock Grid.Row="0"
                  Text="Editar libro"
                  FontSize="20" FontWeight="SemiBold"
                  Foreground="{DynamicResource App.TextPrimaryBrush}"
                  Margin="0,0,0,16"/>
 
-      <!-- Cuerpo -->
-      <Grid Grid.Row="1">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="360"/>
-          <ColumnDefinition Width="28"/>
-          <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+            <!-- Cuerpo -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360"/>
+                    <ColumnDefinition Width="28"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Columna izquierda: portada -->
-        <Grid Grid.Column="0">
-          <!-- halo suave -->
-          <Ellipse Width="220" Height="220"
-                   Fill="{DynamicResource App.DividerBrush}"
-                   Opacity="0.25"
-                   HorizontalAlignment="Center" VerticalAlignment="Top"
-                   Margin="0,12,0,0"/>
+                <!-- Columna izquierda: portada -->
+                <Grid Grid.Column="0">
+                    <Ellipse Width="220" Height="220"
+             Fill="{DynamicResource App.DividerBrush}"
+             Opacity="0.25"
+             HorizontalAlignment="Center" VerticalAlignment="Top"
+             Margin="0,12,0,0"/>
+                    <Border Width="240" Height="340"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            CornerRadius="8"
+            BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                        <!-- preview portada -->
+                        <Border.Background>
+                            <ImageBrush Stretch="UniformToFill"
+                        ImageSource="{Binding PortadaUrl, Converter={StaticResource SafeImg}}"/>
+                        </Border.Background>
+                    </Border>
 
-          <!-- marco de portada -->
-          <Border Width="240" Height="340"
-                  HorizontalAlignment="Center" VerticalAlignment="Center"
-                  CornerRadius="8"
-                  BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1"
-                  Background="{DynamicResource App.SurfaceBrush}">
-           
-          </Border>
+                    <!-- Botones debajo de la imagen -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                        <Button Content="Subir portada" 
+                Command="{Binding UploadPortadaCommand}" 
+                Margin="0,0,10,0"/>
+                        <Button Content="Quitar" 
+                Command="{Binding RemovePortadaCommand}"/>
+                    </StackPanel>
+                </Grid>
 
-          <!-- URL de imagen (sincroniza preview) -->
-          <StackPanel Margin="0,12,0,0" VerticalAlignment="Bottom">
-            <TextBox materialDesign:HintAssist.Hint="URL de la portada"
-                     Text="{Binding CoverUrl, UpdateSourceTrigger=PropertyChanged}"
-                     Margin="0,6,0,0"/>
-          </StackPanel>
-        </Grid>
 
-        <!-- Separador -->
-        <Rectangle Grid.Column="1" Width="1"
-                   Fill="{DynamicResource App.DividerBrush}"
-                   HorizontalAlignment="Center"/>
+                <!-- Separador -->
+                <Rectangle Grid.Column="1" Width="1"
+                           Fill="{DynamicResource App.DividerBrush}"
+                           HorizontalAlignment="Center"/>
 
-        <!-- Columna derecha: formulario -->
-        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                <!-- Columna derecha: formulario -->
+                <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
 
-            <!-- Fila 0: Título + Género -->
-            <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,8,10"
-                     materialDesign:HintAssist.Hint="Título"
-                     Text="{Binding Title}"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" Margin="8,0,0,10"
-                      ItemsSource="{Binding GenreItems}"
-                      SelectedValuePath="Key" DisplayMemberPath="Value"
-                      SelectedValue="{Binding SelectedGenre, Mode=TwoWay}"
-                      materialDesign:HintAssist.Hint="Género"/>
+                        <!-- Bloque 1: Información básica -->
+                        <TextBlock Text="📖 Información básica" 
+                                   FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="Título" FontSize="12" 
+                                   Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                        <TextBox Text="{Binding Titulo}" Margin="0,2,0,10"/>
 
-            <!-- Fila 1: Autor / Estado -->
-            <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,8,10">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-              </Grid.ColumnDefinitions>
-              <TextBox Grid.Column="0"
-                       materialDesign:HintAssist.Hint="Autor(es)"
-                       Text="{Binding Author}"/>
+                        <TextBlock Text="Autor(es)" FontSize="12" 
+                                   Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                        <TextBox Text="{Binding AutoresTexto}" Margin="0,2,0,10"/>
+
+                        <Separator Margin="0,8"/>
+
+                        <!-- Bloque 2: Editorial y publicación -->
+                        <TextBlock Text="🏷️ Publicación" 
+                                   FontWeight="Bold" Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Width="180">
+                                <TextBlock Text="Editorial" FontSize="12" 
+                                           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                <TextBox Text="{Binding Editorial}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Width="150" Margin="12,0,0,0">
+                                <TextBlock Text="ISBN" FontSize="12" 
+                                           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                <TextBox Text="{Binding Isbn}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock Text="Fecha de publicación" FontSize="12" 
+                                   Margin="0,8,0,0"
+                                   Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                        <DatePicker SelectedDate="{Binding FechaPublicacion}" Margin="0,2,0,10"/>
+
+                        <Separator Margin="0,8"/>
+
+                        <!-- Bloque 3: Valoración -->
+                        <TextBlock Text="⭐ Valoración" 
+                                   FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="Calificación (1 a 5)" FontSize="12" 
+                                   Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                        <TextBox Text="{Binding Rating}" Margin="0,2,0,10"/>
+
+                        <Separator Margin="0,8"/>
+
+                        <!-- Bloque 4: Sinopsis -->
+                        <TextBlock Text="📝 Sinopsis" 
+                                   FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding Sinopsis}" Height="150"
+                                 AcceptsReturn="True" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
 
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="8,0,0,10"
-                      ItemsSource="{Binding ConditionItems}"
-                      SelectedValuePath="Key" DisplayMemberPath="Value"
-                      SelectedValue="{Binding ConditionKey, Mode=TwoWay}"
-                      materialDesign:HintAssist.Hint="Estado"/>
-
-            <!-- Fila 2: Editorial + ISBN -->
-            <TextBox Grid.Row="2" Grid.Column="0" Margin="0,0,8,10"
-                     materialDesign:HintAssist.Hint="Editorial"
-                     Text="{Binding Publisher}"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0,0,10"
-                     materialDesign:HintAssist.Hint="ISBN"
-                     Text="{Binding Isbn}"/>
-
-            <!-- Fila 3: Año + Stock -->
-            <TextBox Grid.Row="3" Grid.Column="0" Margin="0,0,8,10"
-                     materialDesign:HintAssist.Hint="Año"
-                     Text="{Binding Year}"/>
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="8,0,0,10"
-                     materialDesign:HintAssist.Hint="Cantidad (stock)"
-                     Text="{Binding Stock}"/>
-
-            <!-- Fila 4: Calificación + Disponible -->
-            <TextBox Grid.Row="4" Grid.Column="0" Margin="0,0,8,10"
-                     materialDesign:HintAssist.Hint="Calificación"
-                     Text="{Binding Rating}"/>
-            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal"
-                        Margin="8,6,0,10">
-              <CheckBox IsChecked="{Binding Available}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-              <TextBlock Text="Disponible" VerticalAlignment="Center"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </StackPanel>
-
-            <!-- Fila 5-6: Sinopsis -->
-            <TextBox Grid.Row="6" Grid.ColumnSpan="2" Height="150"
-                     AcceptsReturn="True" TextWrapping="Wrap"
-                     materialDesign:HintAssist.Hint="Sinopsis"
-                     Text="{Binding Synopsis}"/>
-          </Grid>
-        </ScrollViewer>
-      </Grid>
-
-      <!-- Footer -->
-      <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,18,0,0">
-        <!-- Cancelar -->
-        <Button DockPanel.Dock="Right" Margin="8,0,0,0"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Null}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Cancelar"/>
-          </StackPanel>
-        </Button>
-
-        <!-- Guardar cambios -->
-        <Button DockPanel.Dock="Right"
-                IsEnabled="{Binding IsValid}"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{Binding}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="ContentSaveOutline" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Guardar cambios"/>
-          </StackPanel>
-        </Button>
-      </DockPanel>
-    </Grid>
-  </Border>
+            <!-- Footer -->
+            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,18,0,0">
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{x:Null}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
+                <Button DockPanel.Dock="Right"
+                        IsEnabled="{Binding IsValid}"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{Binding}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="ContentSaveOutline" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Guardar cambios"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Grid>
+    </Border>
 </UserControl>

@@ -3,194 +3,88 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:converters="clr-namespace:library.Converters"
-             MinWidth="520" MaxWidth="680" MaxHeight="420">
+             xmlns:converters="clr-namespace:library.Converters" xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             MinWidth="420" MaxWidth="520" MaxHeight="260">
 
-  <!-- ===== Resources (theme-aware) ===== -->
-  <UserControl.Resources>
-    <converters:SafeImageSourceConverter x:Key="SafeImg" />
+    <UserControl.Resources>
+        <converters:SafeImageSourceConverter x:Key="SafeImg"/>
+    </UserControl.Resources>
 
-    <!-- Fondo de advertencia suave (se adapta a Light/Dark) -->
-    <SolidColorBrush x:Key="WarnSurfaceBrush"
-                     Color="{DynamicResource App.WarningColor}"
-                     Opacity="0.12"/>
-    <SolidColorBrush x:Key="WarnBorderBrush"
-                     Color="{DynamicResource App.WarningColor}"
-                     Opacity="0.6"/>
+    <Border Padding="20"
+            Background="{DynamicResource App.CardBrush}"
+            BorderBrush="{DynamicResource App.BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-    <!-- Píldoras -->
-    <Style x:Key="PillButtonBase" TargetType="Button">
-      <Setter Property="Height" Value="36"/>
-      <Setter Property="MinWidth" Value="140"/>
-      <Setter Property="Padding" Value="12,0"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
-      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PageHoverBg}"/>
-              </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.55"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-
-    <Style x:Key="PillOutlineButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}"/>
-
-    <Style x:Key="PillDangerButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}">
-      <Setter Property="Background"  Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="Foreground"  Value="White"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
-              </Trigger>
-              <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-  </UserControl.Resources>
-
-  <!-- ===== Content ===== -->
-  <Border Padding="22"
-          Background="{DynamicResource App.CardBrush}"
-          BorderBrush="{DynamicResource App.BorderBrush}"
-          BorderThickness="1"
-          CornerRadius="10">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
-
-      <!-- Título -->
-      <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
-        <mah:PackIconMaterial Kind="TrashCanOutline" Width="20" Height="20"
-                              Foreground="{DynamicResource App.ErrorBrush}"/>
-        <TextBlock Text="Eliminar libro"
-                   FontSize="20" FontWeight="SemiBold"
-                   Foreground="{DynamicResource App.TextPrimaryBrush}"
-                   Margin="8,0,0,0"/>
-      </StackPanel>
-
-      <!-- Cuerpo -->
-      <Grid Grid.Row="1">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="180"/>
-          <ColumnDefinition Width="20"/>
-          <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Portada -->
-        <Border Grid.Column="0"
-                Width="140" Height="200" CornerRadius="8"
-                BorderBrush="{DynamicResource App.BorderBrush}"
-                BorderThickness="1"
-                Background="{DynamicResource App.SurfaceBrush}"
-                HorizontalAlignment="Center" VerticalAlignment="Top">
-        </Border>
-
-        <!-- Datos + advertencia -->
-        <StackPanel Grid.Column="2">
-          <TextBlock Text="{Binding Title}"
-                     FontWeight="SemiBold" FontSize="16"
-                     TextWrapping="Wrap"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-          <TextBlock>
-            <Run Text="por " Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-            <Run Text="{Binding Author}" Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-          </TextBlock>
-
-          <StackPanel Orientation="Horizontal" Margin="0,8,0,0" >
-            <StackPanel>
-              <TextBlock Text="ISBN" FontSize="12"
-                         Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Isbn}" Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+            <!-- 🔹 Header -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+                <mah:PackIconMaterial Kind="TrashCanOutline" Width="22" Height="22"
+                                      Foreground="{DynamicResource App.ErrorBrush}"/>
+                <TextBlock Text="Eliminar libro"
+                           FontSize="18" FontWeight="SemiBold"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"
+                           Margin="8,0,0,0"/>
             </StackPanel>
-            <StackPanel>
-              <TextBlock Text="Categoría" FontSize="12" Margin="10,0,10,0"
-                         Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Category}" Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </StackPanel>
-            <StackPanel>
-              <TextBlock Text="Año" FontSize="12"
-                         Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-              <TextBlock Text="{Binding Year}" Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-            </StackPanel>
-          </StackPanel>
 
-          <!-- Advertencia -->
-          <Border Background="{StaticResource WarnSurfaceBrush}"
-                  BorderBrush="{StaticResource WarnBorderBrush}"
-                  BorderThickness="1"
-                  CornerRadius="8"
-                  Padding="10" Margin="0,16,0,0">
-            <StackPanel Orientation="Horizontal">
-              <mah:PackIconMaterial Kind="AlertOctagonOutline" Width="20" Height="20"
-                                    Foreground="{DynamicResource App.WarningBrush}"
-                                    Margin="0,0,8,0"/>
-              <TextBlock Text="Esta acción no se puede deshacer. Se eliminará el libro del catálogo."
-                         TextWrapping="Wrap"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+            <!-- 🔹 Contenido principal -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,16">
+                <TextBlock Text="{Binding Titulo}" 
+                           FontWeight="Bold" FontSize="16" 
+                           Foreground="{DynamicResource App.TextPrimaryBrush}" 
+                           TextAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding AutoresTexto}" 
+                           FontSize="13" Foreground="{DynamicResource App.TextSecondaryBrush}" 
+                           Margin="0,4,0,0" TextAlignment="Center"/>
+                <TextBlock Text="{Binding Isbn}" 
+                           FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}" 
+                           Margin="0,4,0,0" TextAlignment="Center"/>
+
+                <!-- Mensaje de advertencia -->
+                <Border Background="#FFFDECEA"
+                        BorderBrush="#FFF5C6CB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10" Margin="0,12,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <mah:PackIconMaterial Kind="AlertOutline" Width="20" Height="20"
+                                              Foreground="{DynamicResource App.ErrorBrush}" Margin="0,0,8,0"/>
+                        <TextBlock Text="Esta acción no se puede deshacer. El libro será eliminado permanentemente."
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource App.TextPrimaryBrush}" 
+                                   FontSize="13"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
-          </Border>
-        </StackPanel>
-      </Grid>
 
-      <!-- Footer -->
-      <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,16,0,0">
-        <!-- Cancelar -->
-        <Button Style="{StaticResource PillOutlineButton}"
-                DockPanel.Dock="Right" Margin="8,0,0,0"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Null}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Cancelar"/>
-          </StackPanel>
-        </Button>
+            <!-- 🔹 Footer -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Margin="0,0,8,0"
+                        Background="Transparent"
+                        BorderBrush="{DynamicResource App.BorderBrush}"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{x:Static sys:Boolean.FalseString}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
 
-        <!-- Eliminar -->
-        <Button Style="{StaticResource PillDangerButton}"
-                DockPanel.Dock="Right"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="True">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Eliminar"/>
-          </StackPanel>
-        </Button>
-      </DockPanel>
-    </Grid>
-  </Border>
+                <Button Background="{DynamicResource App.ErrorBrush}"
+                        Foreground="White"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{x:Static sys:Boolean.TrueString}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="TrashCan" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Eliminar"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

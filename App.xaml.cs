@@ -45,16 +45,15 @@ namespace library
                     services.AddTransient<BooksViewModel>();
                     services.AddTransient<MembersViewModel>();
                     services.AddTransient<OrdersViewModel>();
-                    
+                    services.AddTransient<LoanViewModel>();
+
                     // Registrar ventanas
                     services.AddSingleton<MainWindow>();
                 })
                 .Build();
             ThemeService.Apply(false);
             await _host.StartAsync();
-     // Mostrar la ventana principal
-            var mainWindow = GetService<MainWindow>();
-            mainWindow.Show();
+    
         }
 
         protected override async void OnExit(ExitEventArgs e)

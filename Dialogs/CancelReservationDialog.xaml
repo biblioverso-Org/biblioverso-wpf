@@ -5,139 +5,107 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
              MinWidth="460" MaxWidth="640" MaxHeight="420">
 
-  <!-- ===== Resources (100% theme-aware) ===== -->
-  <UserControl.Resources>
-
-    <!-- Botón píldora base -->
-    <Style x:Key="PillButtonBase" TargetType="Button">
-      <Setter Property="Height" Value="36"/>
-      <Setter Property="MinWidth" Value="140"/>
-      <Setter Property="Padding" Value="12,0"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
-      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
+    <UserControl.Resources>
+        <!-- Botón píldora base -->
+        <Style x:Key="PillButtonBase" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="140"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" CornerRadius="18"
                     Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PageHoverBg}"/>
-              </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.55"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PageHoverBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-    <!-- Outline (volver) -->
-    <Style x:Key="PillOutlineButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}" />
+        <Style x:Key="PillOutlineButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}" />
 
-    <!-- PELIGRO (confirmar cancelación) -->
-    <Style x:Key="PillDangerButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}">
-      <Setter Property="Background"  Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="Foreground"  Value="White"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <!-- Sin token de hover específico: suavizamos con opacidad -->
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
-              </Trigger>
-              <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
-              </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.55"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
+        <Style x:Key="PillDangerButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}">
+            <Setter Property="Background"  Value="{DynamicResource App.ErrorBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource App.ErrorBrush}"/>
+            <Setter Property="Foreground"  Value="White"/>
+        </Style>
+    </UserControl.Resources>
 
-  </UserControl.Resources>
-
-  <!-- ===== Content ===== -->
-  <Border Padding="22"
+    <Border Padding="22"
           Background="{DynamicResource App.CardBrush}"
           BorderBrush="{DynamicResource App.BorderBrush}"
           BorderThickness="1"
           CornerRadius="10">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-      <!-- Título -->
-      <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-        <mah:PackIconMaterial Kind="AlertCircleOutline" Width="20" Height="20" Margin="0,0,8,0"
+            <!-- Título -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                <mah:PackIconMaterial Kind="AlertCircleOutline" Width="20" Height="20" Margin="0,0,8,0"
                               Foreground="{DynamicResource App.ErrorBrush}"/>
-        <TextBlock Text="Cancelar reserva"
+                <TextBlock Text="Cancelar reserva"
                    FontSize="20" FontWeight="SemiBold"
                    Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-      </StackPanel>
+            </StackPanel>
 
-      <!-- Cuerpo -->
-      <StackPanel Grid.Row="1">
-        <TextBlock Text="¿Seguro que deseas cancelar esta reserva?"
+            <!-- Cuerpo -->
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="¿Seguro que deseas cancelar esta reserva?"
                    Foreground="{DynamicResource App.TextPrimaryBrush}" Margin="0,0,0,8"/>
-        <TextBlock Text="{Binding Reservation.BookTitle}"
+                <TextBlock Text="{Binding Reserva.Libro.Titulo}"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-        <TextBlock Text="{Binding Reservation.MemberName}"
+                <TextBlock Text="{Binding Reserva.Usuario.NombreCompleto}"
                    Foreground="{DynamicResource App.TextSecondaryBrush}" Margin="0,2,0,10"/>
 
-        <TextBox materialDesign:HintAssist.Hint="Motivo (opcional)"
+                <TextBox materialDesign:HintAssist.Hint="Motivo (opcional)"
                  Text="{Binding Reason}"
                  AcceptsReturn="True" Height="100" TextWrapping="Wrap"/>
-      </StackPanel>
+            </StackPanel>
 
-      <!-- Footer -->
-      <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,16,0,0">
-        <!-- Volver -->
-        <Button Style="{StaticResource PillOutlineButton}"
+            <!-- Footer -->
+            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,16,0,0">
+                <Button Style="{StaticResource PillOutlineButton}"
                 DockPanel.Dock="Right" Margin="8,0,0,0"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 CommandParameter="{x:Null}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Volver"/>
-          </StackPanel>
-        </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Volver"/>
+                    </StackPanel>
+                </Button>
 
-        <!-- Confirmar cancelación -->
-        <Button Style="{StaticResource PillDangerButton}"
+                <Button Style="{StaticResource PillDangerButton}"
                 DockPanel.Dock="Right"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 CommandParameter="{Binding}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="DeleteForeverOutline" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Confirmar cancelación"/>
-          </StackPanel>
-        </Button>
-      </DockPanel>
-    </Grid>
-  </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="DeleteForeverOutline" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Confirmar cancelación"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Grid>
+    </Border>
 </UserControl>

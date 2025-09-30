@@ -32,6 +32,7 @@ public partial class ShellViewModel : ObservableObject
     public MembersViewModel Members { get; private set; }
     public OrdersViewModel Orders { get; private set; }
     public TopBarViewModel TopBar { get; private set; }
+    public LoanViewModel Loans { get; private set; }
 
     public ObservableCollection<NavigationItem> NavItems { get; } = new();
 
@@ -42,6 +43,7 @@ public partial class ShellViewModel : ObservableObject
         CustomersViewModel customers,
         BooksViewModel books,
         MembersViewModel members,
+        LoanViewModel loans,
         OrdersViewModel orders,
         TopBarViewModel topBar)
     {
@@ -51,9 +53,10 @@ public partial class ShellViewModel : ObservableObject
         Customers = customers;
         Books = books;
         Members = members;
+        Loans = loans;
         Orders = orders;
         TopBar = topBar;
-
+        
         // Suscribirse a eventos del servicio de sesión
         _userSessionService.UserLoggedIn += OnUserLoggedIn;
         _userSessionService.UserLoggedOut += OnUserLoggedOut;
@@ -63,6 +66,7 @@ public partial class ShellViewModel : ObservableObject
 
         SetupNavigation();
         UpdateAuthenticationState();
+        
     }
 
     private void SetupNavigation()
@@ -76,8 +80,8 @@ public partial class ShellViewModel : ObservableObject
             targetVm: Customers));
         NavItems.Add(new NavigationItem("Libros", PackIconMaterialKind.BookMultipleOutline, NavSection.Primary,
             targetVm: Books));
-        NavItems.Add(new NavigationItem("Miembros", PackIconMaterialKind.AccountMultipleOutline, NavSection.Primary,
-            targetVm: Members));
+        NavItems.Add(new NavigationItem("Prestamos", PackIconMaterialKind.AccountMultipleOutline, NavSection.Primary,
+            targetVm: Loans));
         NavItems.Add(new NavigationItem("Reservas", PackIconMaterialKind.CalendarMonthOutline, NavSection.Primary,
             targetVm: Orders));
         NavItems.Add(new NavigationItem("Cerrar sesión", PackIconMaterialKind.LogoutVariant, NavSection.Secondary));
@@ -174,6 +178,12 @@ public partial class ShellViewModel : ObservableObject
     {
         if (!IsLoggedIn) return;
         CurrentViewModel = Dashboard;
+    }
+
+    public void NavigateToLoans()   // ✅ NUEVO
+    {
+        if (!IsLoggedIn) return;
+        CurrentViewModel = Loans;
     }
 
     public void NavigateToCustomers()

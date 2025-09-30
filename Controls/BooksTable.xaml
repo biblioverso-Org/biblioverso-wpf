@@ -10,13 +10,9 @@
     <!-- Recursos -->
     <UserControl.Resources>
         <ResourceDictionary>
-            <!-- Reusa los estilos del CustomersTable -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- Ajusta la ruta si tu Styles.xaml está en otra ubicación -->
                 <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Converter para cargar imágenes de forma segura -->
             <converters:SafeImageSourceConverter x:Key="SafeImg" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -28,7 +24,8 @@
 
         <!-- TABLA -->
         <DataGrid Grid.Row="0"
-                  ItemsSource="{Binding BooksView}"
+                  Background="{DynamicResource App.CardBrush}"
+                  ItemsSource="{Binding LibrosView}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   CanUserReorderColumns="False"
@@ -47,92 +44,108 @@
                   behaviors:AdaptiveColumnsBehavior.Breakpoints="
                     1150:Stock;
                     1100:Year;
-                    1020:Category;
+                    1020:Genero;
                     940:ISBN;
-                    860:Author;">
+                    860:Autores;">
 
             <DataGrid.Columns>
 
-                <!-- Portada -->
-                <DataGridTemplateColumn Header="PORTADA" Width="70" CanUserSort="False"
-                                        behaviors:AdaptiveColumnsBehavior.Key="Cover">
+                <!-- Columna combinada: Portada + Info -->
+                <DataGridTemplateColumn Header="LIBRO" Width="2*"
+                        behaviors:AdaptiveColumnsBehavior.Key="Libro">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid Width="40" Height="54" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Border Margin="5" CornerRadius="4" Background="#EEF2F7" BorderBrush="#E2E8F0"
-                                        BorderThickness="1" />
-                                <Border CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,2">
+                                <!-- Portada -->
+                                <Border Width="40" Height="54" CornerRadius="4"
+                        BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1"
+                        Margin="0,0,10,0">
                                     <Border.Background>
                                         <ImageBrush Stretch="UniformToFill"
-                                                    ImageSource="{Binding CoverPath, Converter={StaticResource SafeImg}}" />
+                                    ImageSource="{Binding Portada, Converter={StaticResource SafeImg}}"/>
                                     </Border.Background>
                                 </Border>
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="TÍTULO"
-                                    SortMemberPath="Title"
-                                    behaviors:AdaptiveColumnsBehavior.Key="Title"
-                                    Binding="{Binding Title}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="2*" />
+                                <!-- Info del libro -->
+                                <StackPanel>
+                                    <!-- Título -->
+                                    <TextBlock Text="{Binding Titulo}" 
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource App.TextPrimaryBrush}"
+                                               TextWrapping="Wrap"/>
 
-                <DataGridTextColumn Header="AUTOR"
-                                    SortMemberPath="Author"
-                                    behaviors:AdaptiveColumnsBehavior.Key="Author"
-                                    Binding="{Binding Author}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="2*" />
+                                    <!-- ISBN -->
+                                    <TextBlock Text="{Binding ISBN}" 
+                               FontSize="11"
+                               Foreground="{DynamicResource App.TextSecondaryBrush}"
+                               TextTrimming="CharacterEllipsis"/>
 
-                <DataGridTextColumn Header="ISBN"
-                                    SortMemberPath="ISBN"
-                                    behaviors:AdaptiveColumnsBehavior.Key="ISBN"
-                                    Binding="{Binding ISBN}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
-
-                <DataGridTextColumn Header="CATEGORÍA"
-                                    SortMemberPath="Category"
-                                    behaviors:AdaptiveColumnsBehavior.Key="Category"
-                                    Binding="{Binding Category}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
-
-                <DataGridTextColumn Header="AÑO"
-                                    SortMemberPath="Year"
-                                    behaviors:AdaptiveColumnsBehavior.Key="Year"
-                                    Binding="{Binding Year}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
-
-                <DataGridTextColumn Header="STOCK"
-                                    SortMemberPath="Stock"
-                                    behaviors:AdaptiveColumnsBehavior.Key="Stock"
-                                    Binding="{Binding Stock}"
-                                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
-
-                <!-- Acción -->
-                <DataGridTemplateColumn Header="ACCIÓN" Width="120" CanUserSort="False"
-                                        behaviors:AdaptiveColumnsBehavior.Key="Action">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Editar"
-                                        Command="{Binding DataContext.EditBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}">
-                                    <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18"
-                                                          Foreground="#6B7280" />
-                                </Button>
-                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Eliminar"
-                                        Command="{Binding DataContext.DeleteBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}">
-                                    <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18"
-                                                          Foreground="#6B7280" />
-                                </Button>
+                                    <!-- Autores -->
+                                    <TextBlock Text="{Binding AutoresTexto}" 
+                               FontSize="11"
+                               Foreground="{DynamicResource App.TextSecondaryBrush}"
+                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <!-- Editorial -->
+                <DataGridTextColumn Header="EDITORIAL"
+                    SortMemberPath="Editorial"
+                    behaviors:AdaptiveColumnsBehavior.Key="EDITORIAL"
+                    Binding="{Binding EditorialTexto}"
+                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
+
+                <!-- Género -->
+                <DataGridTextColumn Header="GÉNERO"
+                    SortMemberPath="Genero"
+                    behaviors:AdaptiveColumnsBehavior.Key="Genero"
+                    Binding="{Binding GeneroTexto}"
+                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
+
+
+                <!-- Año -->
+                    <DataGridTextColumn Header="AÑO"
+                                    SortMemberPath="FechaPublicacion"
+                                    behaviors:AdaptiveColumnsBehavior.Key="Year"
+                                    Binding="{Binding FechaPublicacion.Year}"
+                                    ElementStyle="{StaticResource CellTextCenter}" Width="*" />
+
+                   
+
+                    <!-- Acción -->
+                    <DataGridTemplateColumn Header="ACCIÓN" Width="120" CanUserSort="False"
+                                        behaviors:AdaptiveColumnsBehavior.Key="Action">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Gestionar stock"
+        Command="{Binding DataContext.ManageStockCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="BookCogOutline" Width="18" Height="18"
+                          Foreground="#6B7280" />
+                                </Button>
+                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Editar"
+                                        Command="{Binding DataContext.EditBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                        <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18"
+                                                          Foreground="#6B7280" />
+                                    </Button>
+                                    <Button Style="{StaticResource GhostIconButton}" ToolTip="Eliminar"
+                                        Command="{Binding DataContext.DeleteBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                        <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18"
+                                                          Foreground="#6B7280" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
-
     </Grid>
 </UserControl>

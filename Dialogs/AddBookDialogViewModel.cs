@@ -1,21 +1,26 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using library.Models;
+using library.Services; // GoogleBooksService, CategoriaService
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace library.Dialogs.AddBook
 {
     public partial class AddBookDialogViewModel : ObservableObject
     {
-        // ======= Paso actual del wizard (0=Buscar, 1=Detalles, 2=Distribución) =======
-        [ObservableProperty] private int stepIndex = 0;
+        private readonly GoogleBooksService _googleBooks = new();
+        private readonly CategoriaService _categoriaService = new();
 
-        public bool IsStepSearch        => StepIndex == 0;
-        public bool IsStepDetails       => StepIndex == 1;
-        public bool IsStepDistribution  => StepIndex == 2;
+        [ObservableProperty] private int stepIndex = 0;
+        public bool IsStepSearch => StepIndex == 0;
+        public bool IsStepDetails => StepIndex == 1;
+        public bool IsStepDistribution => StepIndex == 2;
 
         partial void OnStepIndexChanged(int value)
         {
@@ -25,73 +30,23 @@ namespace library.Dialogs.AddBook
             OnPropertyChanged(nameof(CanSave));
         }
 
-        // ======= Resultado seleccionado =======
-        [ObservableProperty] private string? title;
-        [ObservableProperty] private string? author;
+        // ======= Campos de Libro =======
+        [ObservableProperty] private string? titulo;
+        [ObservableProperty] private string? autoresTexto;
         [ObservableProperty] private string? isbn;
-        [ObservableProperty] private string? category;
-        [ObservableProperty] private int year;
+
+        // 🔄 Normalizado: categoría (id + nombre)
+        [ObservableProperty] private int? selectedCategoriaId;
+        [ObservableProperty] private string? editorial;
+
+        [ObservableProperty] private DateTime? fechaPublicacion;
         [ObservableProperty] private int stock = 1;
         [ObservableProperty] private double rating;
-        [ObservableProperty] private bool available = true;
-        [ObservableProperty] private string? coverPath;
+        [ObservableProperty] private bool disponible = true;
+        [ObservableProperty] private string? portada;
+        [ObservableProperty] private string? sinopsis;
 
-        // ======= Campos adicionales =======
-        [ObservableProperty] private string? coverUrl;
-        [ObservableProperty] private string? publisher;
-        [ObservableProperty] private string? synopsis;
-
-        // Estado del libro (ComboBox)
-        [ObservableProperty] private string conditionKey = "new"; // new|good|damaged|lost
-
-        public IReadOnlyList<KeyValuePair<string, string>> ConditionItems { get; } = new[]
-        {
-            new KeyValuePair<string,string>("new",     "Nuevo"),
-            new KeyValuePair<string,string>("good",    "Bueno"),
-            new KeyValuePair<string,string>("damaged", "Dañado"),
-            new KeyValuePair<string,string>("lost",    "Perdido"),
-        };
-
-        [ObservableProperty] private DateTime? publicationDate;
-
-        // ======= Filtros paso 1 =======
-        [ObservableProperty] private string searchText = string.Empty;
-        [ObservableProperty] private string availability = "all";  // all|in|out
-        [ObservableProperty] private string selectedGenre = "all";
-        [ObservableProperty] private double minRating = 0;
-
-        public IReadOnlyList<KeyValuePair<string, string>> AvailabilityItems { get; } = new[]
-        {
-            new KeyValuePair<string,string>("all","Todos"),
-            new KeyValuePair<string,string>("in","Disponible"),
-            new KeyValuePair<string,string>("out","No disponible"),
-        };
-
-        public IReadOnlyList<KeyValuePair<string, string>> GenreItems { get; } = new[]
-        {
-            new KeyValuePair<string,string>("all","Todos los géneros"),
-            new KeyValuePair<string,string>("novel","Novel"),
-            new KeyValuePair<string,string>("history","History"),
-            new KeyValuePair<string,string>("technology","Technology"),
-            new KeyValuePair<string,string>("fantasy","Fantasy"),
-            new KeyValuePair<string,string>("science","Science"),
-        };
-
-        public IReadOnlyList<KeyValuePair<double, string>> RatingItems { get; } = new[]
-        {
-            new KeyValuePair<double,string>(0,   "Todas las calificaciones"),
-            new KeyValuePair<double,string>(3.0, "3★ o más"),
-            new KeyValuePair<double,string>(4.0, "4★ o más"),
-            new KeyValuePair<double,string>(4.5, "4.5★ o más"),
-        };
-
-        // ======= Sugerencias =======
-        public ObservableCollection<BookPick> Suggestions { get; }
-        public ICollectionView SuggestionsView { get; }
-
-        [ObservableProperty] private BookPick? selectedSuggestion;
-
-        // ======= Distribución por estado =======
+        // ======= Distribución =======
         [ObservableProperty] private int distNew;
         [ObservableProperty] private int distUsed;
         [ObservableProperty] private int distWorn;
@@ -99,48 +54,76 @@ namespace library.Dialogs.AddBook
         [ObservableProperty] private int distRepaired;
         [ObservableProperty] private int distRestoring;
 
+        // 🔔 Recalcular cuando cambien las cantidades
+        partial void OnDistNewChanged(int value) => UpdateDistribution();
+        partial void OnDistUsedChanged(int value) => UpdateDistribution();
+        partial void OnDistWornChanged(int value) => UpdateDistribution();
+        partial void OnDistDamagedChanged(int value) => UpdateDistribution();
+        partial void OnDistRepairedChanged(int value) => UpdateDistribution();
+        partial void OnDistRestoringChanged(int value) => UpdateDistribution();
+
+        private void UpdateDistribution()
+        {
+            OnPropertyChanged(nameof(DistTotal));
+            OnPropertyChanged(nameof(DistDiff));
+            OnPropertyChanged(nameof(CanSave));
+        }
+
         public int DistTotal =>
             DistNew + DistUsed + DistWorn + DistDamaged + DistRepaired + DistRestoring;
 
         public int DistDiff => Stock - DistTotal;
 
-        // Validaciones
         public bool IsValid =>
-            !string.IsNullOrWhiteSpace(Title) &&
-            !string.IsNullOrWhiteSpace(Author) &&
-            !string.IsNullOrWhiteSpace(Isbn);
+            !string.IsNullOrWhiteSpace(Titulo) &&
+            !string.IsNullOrWhiteSpace(Isbn) &&
+            SelectedCategoriaId.HasValue;
 
-        // Guardar permitido:
-        // - En paso 1 (Detalles) alcanza con IsValid
-        // - En paso 2 (Distribución) además DistDiff debe ser 0
         public bool CanSave =>
-            IsValid && (StepIndex == 2 ? DistDiff == 0 : true);
+            IsValid && DistDiff == 0 && StepIndex == 2;
+
+        // ======= Sugerencias =======
+        public ObservableCollection<BookPick> Suggestions { get; }
+        public ICollectionView SuggestionsView { get; }
+        [ObservableProperty] private BookPick? selectedSuggestion;
+        [ObservableProperty] private string searchText = string.Empty;
+
+        // ======= Categorías (desde BD) =======
+        public ObservableCollection<Categoria> Categorias { get; } = new();
 
         public AddBookDialogViewModel()
         {
-            Suggestions = new ObservableCollection<BookPick>(Demo());
+            Suggestions = new ObservableCollection<BookPick>();
             SuggestionsView = CollectionViewSource.GetDefaultView(Suggestions);
             SuggestionsView.Filter = Filter;
+
+            _ = LoadInitialSuggestionsAsync();
+            _ = LoadCategoriasAsync();
         }
 
-        // ======= Filtro paso 1 =======
+        private async Task LoadCategoriasAsync()
+        {
+            Categorias.Clear();
+            var cats = await _categoriaService.GetCategoriasAsync();
+            foreach (var c in cats) Categorias.Add(c);
+        }
+
+        private async Task LoadInitialSuggestionsAsync()
+        {
+            var results = await _googleBooks.SearchAsync("popular books");
+            Suggestions.Clear();
+            foreach (var r in results) Suggestions.Add(r);
+            SuggestionsView.Refresh();
+        }
+
         private bool Filter(object obj)
         {
             if (obj is not BookPick s) return false;
 
             var q = (SearchText ?? "").Trim();
             if (q.Length > 0 &&
-                !(Contains(s.Title, q) || Contains(s.Author, q) || Contains(s.ISBN, q)))
+                !(Contains(s.Titulo, q) || Contains(s.AutoresTexto, q) || Contains(s.ISBN, q)))
                 return false;
-
-            if (Availability == "in"  && !s.Available) return false;
-            if (Availability == "out" &&  s.Available) return false;
-
-            if (SelectedGenre != "all" &&
-                !string.Equals(s.CategoryKey, SelectedGenre, StringComparison.OrdinalIgnoreCase))
-                return false;
-
-            if (s.Rating < MinRating) return false;
 
             return true;
         }
@@ -149,39 +132,18 @@ namespace library.Dialogs.AddBook
             !string.IsNullOrWhiteSpace(src) &&
             src.Contains(term, StringComparison.OrdinalIgnoreCase);
 
-        partial void OnSearchTextChanged(string value)     => SuggestionsView.Refresh();
-        partial void OnAvailabilityChanged(string value)   => SuggestionsView.Refresh();
-        partial void OnSelectedGenreChanged(string value)  => SuggestionsView.Refresh();
-        partial void OnMinRatingChanged(double value)      => SuggestionsView.Refresh();
+        partial void OnSearchTextChanged(string value) => _ = SearchBooksAsync(value);
 
-        // Recalcular totales cuando cambian cantidades o stock
-        partial void OnStockChanged(int value)             => RaiseDistTotals();
-        partial void OnDistNewChanged(int value)           => RaiseDistTotals();
-        partial void OnDistUsedChanged(int value)          => RaiseDistTotals();
-        partial void OnDistWornChanged(int value)          => RaiseDistTotals();
-        partial void OnDistDamagedChanged(int value)       => RaiseDistTotals();
-        partial void OnDistRepairedChanged(int value)      => RaiseDistTotals();
-        partial void OnDistRestoringChanged(int value)     => RaiseDistTotals();
-
-        private void RaiseDistTotals()
+        private async Task SearchBooksAsync(string query)
         {
-            OnPropertyChanged(nameof(DistTotal));
-            OnPropertyChanged(nameof(DistDiff));
-            OnPropertyChanged(nameof(CanSave));
+            if (string.IsNullOrWhiteSpace(query)) return;
+            var results = await _googleBooks.SearchAsync(query);
+
+            Suggestions.Clear();
+            foreach (var r in results) Suggestions.Add(r);
+            SuggestionsView.Refresh();
         }
 
-        // Validación mínima
-        partial void OnTitleChanged(string? value)  { OnPropertyChanged(nameof(IsValid)); OnPropertyChanged(nameof(CanSave)); }
-        partial void OnAuthorChanged(string? value) { OnPropertyChanged(nameof(IsValid)); OnPropertyChanged(nameof(CanSave)); }
-        partial void OnIsbnChanged(string? value)   { OnPropertyChanged(nameof(IsValid)); OnPropertyChanged(nameof(CanSave)); }
-
-        partial void OnCoverUrlChanged(string? value)
-        {
-            // Sincroniza preview
-            CoverPath = value;
-        }
-
-        // ======= Navegación / acciones =======
         [RelayCommand]
         private void SelectSuggestion(BookPick? s)
         {
@@ -191,85 +153,97 @@ namespace library.Dialogs.AddBook
             s.IsSelected = true;
             SelectedSuggestion = s;
 
-            // Copiar datos al formulario
-            Title     = s.Title;
-            Author    = s.Author;
-            Isbn      = s.ISBN;
-            Category  = s.Category;
-            Year      = s.Year;
-            Stock     = 1;
-            Rating    = s.Rating;
-            Available = s.Available;
-
-            CoverPath = s.CoverPath;
-            CoverUrl  = s.CoverPath;
-
-            ConditionKey    = "new";
-            PublicationDate ??= Year > 0 ? new DateTime(Year, 1, 1) : null;
+            Titulo = s.Titulo;
+            AutoresTexto = s.AutoresTexto;
+            Isbn = s.ISBN;
+            Editorial = s.Editorial;
+            FechaPublicacion = s.FechaPublicacion;
+            Stock = 1;
+            Rating = s.Rating;
+            Disponible = true;
+            Portada = s.Portada;
+            Sinopsis = s.Sinopsis;
 
             StepIndex = 1;
             OnPropertyChanged(nameof(CanSave));
         }
 
-        [RelayCommand]
-        private void OpenDistribution() => StepIndex = 2;
-
-        [RelayCommand]
-        private void Back()
-        {
-            if (StepIndex > 0) StepIndex--;
-        }
+        [RelayCommand] private void OpenDistribution() => StepIndex = 2;
+        [RelayCommand] private void Back() { if (StepIndex > 0) StepIndex--; }
 
         [RelayCommand]
         private void CreateAuthor()
         {
-            if (string.IsNullOrWhiteSpace(Author))
-                Author = "Nuevo autor";
+            if (string.IsNullOrWhiteSpace(AutoresTexto))
+                AutoresTexto = "Nuevo autor";
             else
-                Author = Author.Trim();
+                AutoresTexto = AutoresTexto.Trim();
 
             OnPropertyChanged(nameof(IsValid));
             OnPropertyChanged(nameof(CanSave));
         }
 
-        // ====== Mock de sugerencias ======
-        private static IEnumerable<BookPick> Demo() => new[]
+        // ✅ Conversión de ViewModel → Libro (para guardarlo en DB)
+        public Libro ToLibro()
         {
-            new BookPick("El Quijote","Miguel de Cervantes","9788420471839","novel","Novel",1605,4.8,true,null,48,"Clásico de la literatura española."),
-            new BookPick("Cien años de soledad","G. García Márquez","9780307474728","novel","Novel",1967,4.7,true,null,53,"Realismo mágico en Macondo."),
-            new BookPick("Sapiens","Yuval Noah Harari","9780062316110","science","Science",2011,4.6,true,null,45,"Breve historia de la humanidad."),
-            new BookPick("Clean Code","Robert C. Martin","9780132350884","technology","Technology",2008,4.5,true,null,40,"Buenas prácticas de código."),
-            new BookPick("Harry Potter y la piedra filosofal","J.K. Rowling","9788478884452","fantasy","Fantasy",1997,4.7,true,null,32,"Inicio de la saga de Hogwarts."),
-            new BookPick("Educated","Tara Westover","9780399590504","history","History",2018,4.4,false,null,29,"Memorias de superación."),
-        };
+            var libro = new Libro
+            {
+                Titulo = Titulo ?? string.Empty,
+                ISBN = Isbn ?? string.Empty,
+                IdCategoria = SelectedCategoriaId,
+                Editorial = Editorial,
+                FechaPublicacion = FechaPublicacion,
+                Portada = Portada,
+                Sinopsis = Sinopsis,
+                FechaCreacion = DateTime.UtcNow,
+                FechaActualizacion = DateTime.UtcNow,
+                Autores = string.IsNullOrWhiteSpace(AutoresTexto)
+                    ? new List<Autor>()
+                    : AutoresTexto.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(a => new Autor { Nombre = a.Trim() })
+                        .ToList(),
+                Stocks = new List<Stock>()
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "Nuevo", Ubicacion = "General" }, DistNew))
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "Usado", Ubicacion = "General" }, DistUsed))
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "Desgastado", Ubicacion = "General" }, DistWorn))
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "Dañado", Ubicacion = "General" }, DistDamaged))
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "Reparado", Ubicacion = "General" }, DistRepaired))
+                    .Concat(Enumerable.Repeat(new Stock { Disponibilidad = true, Estado = "En restauración", Ubicacion = "General" }, DistRestoring))
+                    .ToList()
+            };
+
+            return libro;
+        }
     }
 
-    // DTO para tarjetas
+    // DTO para búsqueda en Google Books
     public partial class BookPick : ObservableObject
     {
-        public string Title { get; }
-        public string Author { get; }
+        public string Titulo { get; }
+        public string AutoresTexto { get; }
         public string ISBN { get; }
-        public string CategoryKey { get; }
-        public string Category { get; }
-        public int Year { get; }
+        public string Categoria { get; }
+        public string? Editorial { get; }
+        public DateTime? FechaPublicacion { get; }
         public double Rating { get; }
-        public bool Available { get; }
-        public string? CoverPath { get; }
-        public int Score { get; }
-        public string Summary { get; }
+        public string? Portada { get; }
+        public string? Sinopsis { get; }
 
         [ObservableProperty] private bool isSelected;
 
-        public BookPick(string title, string author, string isbn,
-                        string categoryKey, string category, int year,
-                        double rating, bool available, string? coverPath,
-                        int score, string summary)
+        public BookPick(string titulo, string autoresTexto, string isbn,
+                        string categoria, string? editorial, DateTime? fechaPublicacion,
+                        double rating, string? portada, string? sinopsis)
         {
-            Title = title; Author = author; ISBN = isbn;
-            CategoryKey = categoryKey; Category = category; Year = year;
-            Rating = rating; Available = available; CoverPath = coverPath;
-            Score = score; Summary = summary;
+            Titulo = titulo;
+            AutoresTexto = autoresTexto;
+            ISBN = isbn;
+            Categoria = categoria;
+            Editorial = editorial;
+            FechaPublicacion = fechaPublicacion;
+            Rating = rating;
+            Portada = portada;
+            Sinopsis = sinopsis;
         }
     }
 }

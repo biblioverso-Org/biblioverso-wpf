@@ -122,9 +122,10 @@
 
   <Style x:Key="CenterCell" TargetType="DataGridCell">
     <Setter Property="VerticalContentAlignment" Value="Center"/>
-    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    <Setter Property="Padding" Value="12,0"/>
-    <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="12,0"/>
+        <Setter Property="Margin" Value="5,0"/>
+        <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     <Setter Property="Template">
       <Setter.Value>
@@ -161,8 +162,8 @@
     <Setter Property="Background" Value="{DynamicResource App.SurfaceBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource HeaderFg}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
-    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    <Setter Property="Padding" Value="12,8"/>
+    <Setter Property="HorizontalContentAlignment" Value="left"/>
+    <Setter Property="Padding" Value="5,8"/>
     <Setter Property="BorderBrush" Value="{DynamicResource HeaderBorder}"/>
     <Setter Property="BorderThickness" Value="0,0,0,1"/>
     <Setter Property="Template">
@@ -173,9 +174,9 @@
                   BorderThickness="{TemplateBinding BorderThickness}"
                   Padding="{TemplateBinding Padding}">
             <Grid>
-              <ContentPresenter Margin="0,0,18,0"
+              <ContentPresenter Margin="0,0,0,0"
                                 VerticalAlignment="Center"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                HorizontalAlignment="Left"/>
               <mah:PackIconMaterial x:Name="ArrowUp" Kind="ChevronUp"
                                     Width="12" Height="12"
                                     HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -209,9 +210,8 @@
   </Style>
 
   <Style x:Key="SlimRow" TargetType="DataGridRow">
-    <Setter Property="MinHeight" Value="50"/>
-    <Setter Property="Height" Value="50"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource RowSeparator}"/>
+        <Setter Property="MinHeight" Value="50"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource RowSeparator}"/>
     <Setter Property="BorderThickness" Value="0,0,0,1"/>
     <Setter Property="Background" Value="{DynamicResource App.SurfaceBrush}"/>
     <Style.Triggers>
@@ -224,7 +224,7 @@
 
       <!-- Cuando se muestran los detalles => altura automática -->
       <Trigger Property="DetailsVisibility" Value="Visible">
-        <Setter Property="Height" Value="Auto"/>
+        <Setter Property="Height" Value="160"/>
       </Trigger>
 	</Style.Triggers>
   </Style>
@@ -240,22 +240,19 @@
     <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.TextSecondary}"/>
     <Setter Property="HorizontalAlignment" Value="Left"/>
     <Style.Triggers>
-      <DataTrigger Binding="{Binding Gender}" Value="{x:Static models:Gender.Male}">
-        <Setter Property="Background" Value="{DynamicResource Brush.InfoSoft}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBorder}"/>
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Info}"/>
-      </DataTrigger>
-      <DataTrigger Binding="{Binding Gender}" Value="{x:Static models:Gender.Female}">
-        <Setter Property="Background" Value="#FFEAF0"/>
-        <Setter Property="BorderBrush" Value="#FFD6E3"/>
-        <Setter Property="TextElement.Foreground" Value="#B23A6F"/>
-      </DataTrigger>
-      <DataTrigger Binding="{Binding Gender}" Value="{x:Static models:Gender.Other}">
-        <Setter Property="Background" Value="{DynamicResource Brush.Muted}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Brush.MutedBorder}"/>
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.TextSecondary}"/>
-      </DataTrigger>
-    </Style.Triggers>
+            <DataTrigger Binding="{Binding Genero}" Value="Male">
+                <Setter Property="Background" Value="{DynamicResource Brush.InfoSoft}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBorder}"/>
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Info}"/>
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding Genero}" Value="Female">
+                <Setter Property="Background" Value="#FFEAF0"/>
+                <Setter Property="BorderBrush" Value="#FFD6E3"/>
+                <Setter Property="TextElement.Foreground" Value="#B23A6F"/>
+            </DataTrigger>
+
+        </Style.Triggers>
   </Style>
 
 </ResourceDictionary>

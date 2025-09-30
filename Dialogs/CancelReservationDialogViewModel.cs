@@ -5,12 +5,12 @@ namespace library.Dialogs
 {
     public partial class CancelReservationDialogViewModel : ObservableObject
     {
-        public Reservation Reservation { get; }
+        public Reserva Reserva { get; }
         [ObservableProperty] private string? reason;
 
-        public CancelReservationDialogViewModel(Reservation r)
+        public CancelReservationDialogViewModel(Reserva r)
         {
-            Reservation = r;
+            Reserva = r;
         }
     }
 }

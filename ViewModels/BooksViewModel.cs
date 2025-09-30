@@ -1,168 +1,213 @@
-using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using library.Abstractions;
-using library.Controls;
 using library.Dialogs;
 using library.Dialogs.AddBook;
 using library.Models;
+using library.Services;
 using MahApps.Metro.IconPacks;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 
-namespace library.ViewModels;
-
-public partial class BooksViewModel : ObservableObject, ISearchable
+namespace library.ViewModels
 {
-    public ObservableCollection<Book> Books { get; } = new();
-
-    public ICollectionView BooksView { get; }
-
-    // Comandos (puedes cambiar a diálogos como en Clientes cuando quieras)
-    public IAsyncRelayCommand AddBookAsyncCommand    { get; }
-    public IAsyncRelayCommand<Book?> EditBookCommand { get; }
-    public IAsyncRelayCommand<Book?> DeleteBookCommand { get; }
-    
-    
-    
-    [ObservableProperty] private AvailabilityFilter availability = AvailabilityFilter.All;
-    [ObservableProperty] private BookCategory? selectedGenre = null;
-    [ObservableProperty] private int? minRating = null;
-
-    private string _search = string.Empty;
-
-    public ObservableCollection<DashStat> Stats { get; }
-    public BooksViewModel()
+    public partial class BooksViewModel : ObservableObject, ISearchable
     {
-        // Demo data
-        Books.Add(new Book { Title="El Quijote", Author="Miguel de Cervantes", ISBN="9788420471839", Year=1605, Category=BookCategory.Novel, Stock=6 });
-        Books.Add(new Book { Title="Cien años de soledad", Author="G. García Márquez", ISBN="9780307474728", Year=1967, Category=BookCategory.Novel, Stock=4 });
-        Books.Add(new Book { Title="Sapiens", Author="Yuval Noah Harari", ISBN="9780062316110", Year=2011, Category=BookCategory.History, Stock=5 });
-        Books.Add(new Book { Title="Clean Code", Author="Robert C. Martin", ISBN="9780132350884", Year=2008, Category=BookCategory.Technology, Stock=3 });
-        Books.Add(new Book { Title="Harry Potter y la piedra filosofal", Author="J.K. Rowling", ISBN="9788478884452", Year=1997, Category=BookCategory.Fantasy, Stock=8 });
+        private readonly ILibroService _service;
 
-        BooksView = CollectionViewSource.GetDefaultView(Books);
-        BooksView.Filter = Filter;
+        public ObservableCollection<Libro> Libros { get; }
+        public ICollectionView LibrosView { get; }
 
-        AddBookAsyncCommand    = new AsyncRelayCommand(AddBookAsync);
-        EditBookCommand        = new AsyncRelayCommand<Book?>(EditBookAsync);
-        DeleteBookCommand      = new AsyncRelayCommand<Book?>(DeleteBookAsync);
-        
-        Stats = new ObservableCollection<DashStat>
+        public IAsyncRelayCommand AddBookAsyncCommand { get; }
+        public IAsyncRelayCommand<Libro?> EditBookCommand { get; }
+        public IAsyncRelayCommand<Libro?> DeleteBookCommand { get; }
+        public IAsyncRelayCommand<Libro?> ManageStockCommand { get; }
+
+        private string _search = string.Empty;
+
+        public ObservableCollection<DashStat> Stats { get; }
+
+        [ObservableProperty] private string availability = "all";
+        [ObservableProperty] private int selectedCategoriaId = -1; // ✅ ahora filtramos por categoría
+        [ObservableProperty] private double minRating = 0;
+
+        public IRelayCommand GenerateBooksReportCommand { get; }
+
+        public BooksViewModel()
         {
-            new DashStat("Libros Totales",     4210,  35, PackIconMaterialKind.BookMultipleOutline),
-            new DashStat("Libros Prestados",    186,  12, PackIconMaterialKind.BookOpenVariant),
-            new DashStat("Libros Disponibles", 4024, -10, PackIconMaterialKind.BookCheckOutline),
-        };
+            _service = new LibroService();
+            Libros = new ObservableCollection<Libro>();
 
-    }
+            LibrosView = CollectionViewSource.GetDefaultView(Libros);
+            LibrosView.Filter = Filter;
 
-    public IRelayCommand GenerateBooksReportCommand => new RelayCommand(() =>
-    {
-        // TODO: generar reporte
-    });
-    
-    private bool Filter(object obj)
-    {
-        if (string.IsNullOrWhiteSpace(_search)) return true;
-        if (obj is not Book b) return false;
-
-        var t = _search.Trim();
-        return Contains(b.Title, t) ||
-               Contains(b.Author, t) ||
-               Contains(b.ISBN, t) ||
-               (b.Publisher?.Contains(t, StringComparison.OrdinalIgnoreCase) ?? false) ||
-               b.Year.ToString().Contains(t, StringComparison.OrdinalIgnoreCase) ||
-               b.Category.ToString().Contains(t, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool Contains(string? s, string term)
-        => !string.IsNullOrEmpty(s) && s.Contains(term, StringComparison.OrdinalIgnoreCase);
-
-    // ISearchable
-    public void SetSearch(string? text)
-    {
-        _search = text ?? string.Empty;
-        BooksView.Refresh();
-    }
-
-    // Puedes reemplazar estos MessageBox por diálogos Material más adelante
-    [RelayCommand]
-    private async Task AddBookAsync()
-    {
-        var vm   = new AddBookDialogViewModel();
-        var view = new AddBookDialog { DataContext = vm };
-
-        var result = await DialogHost.Show(view, "RootDialog");
-        if (result is AddBookDialogViewModel m)
-        {
-            // Mapea a tu modelo Book (ajusta nombres si difieren)
-            Books.Add(new Book
-            {
-                Title     = m.Title ?? "",
-                Author    = m.Author ?? "",
-                ISBN      = m.Isbn ?? "",
-                Year      = m.Year,
-                Stock     = Math.Max(1, m.Stock),
-                CoverPath = m.CoverPath
-            });
+            AddBookAsyncCommand = new AsyncRelayCommand(AddBookAsync);
+            EditBookCommand = new AsyncRelayCommand<Libro?>(EditBookAsync);
+            DeleteBookCommand = new AsyncRelayCommand<Libro?>(DeleteBookAsync);
+            GenerateBooksReportCommand = new RelayCommand(GenerateReport);
+            ManageStockCommand = new AsyncRelayCommand<Libro?>(ManageStockAsync);
+            Stats = new ObservableCollection<DashStat>();
+            _ = LoadLibrosAsync();
         }
-    }
 
-    private async Task EditBookAsync(Book? b)
-    {
-        if (b is null) return;
-
-        var vm   = EditBookDialogViewModel.FromBook(b);
-        var view = new EditBookDialog { DataContext = vm };
-
-        var result = await DialogHost.Show(view, "RootDialog");
-        switch (result)
+        // ===================== Cargar libros =====================
+        private async Task LoadLibrosAsync()
         {
-            // Guardar: el diálogo devuelve su VM
-            case EditBookDialogViewModel m:
-            {
-                b.Title      = m.Title ?? b.Title;
-                b.Author     = m.Author ?? b.Author;
-                b.ISBN       = m.Isbn ?? b.ISBN;
-                b.Year       = m.Year;
-                b.Stock      = m.Stock;
-                b.CoverPath  = m.CoverPath ?? b.CoverPath;
+            Libros.Clear();
+            var libros = await _service.GetLibrosAsync();
+            foreach (var l in libros) Libros.Add(l);
 
-                // opcionales si existen en tu modelo
-                b.Publisher    = m.Publisher ?? b.Publisher;
-                CollectionViewSource.GetDefaultView(Books).Refresh();
-                break;
-            }
+            Stats.Clear();
+            Stats.Add(new DashStat("Libros Totales", Libros.Count, 0, PackIconMaterialKind.BookMultipleOutline));
+            Stats.Add(new DashStat("Libros Disponibles",
+                Libros.Count(b => b.Stocks.Any(s => s.Disponibilidad)), 0,
+                PackIconMaterialKind.BookCheckOutline));
+            Stats.Add(new DashStat("Libros Prestados",
+                Libros.Count(b => b.Stocks.All(s => !s.Disponibilidad)), 0,
+                PackIconMaterialKind.BookOpenVariant));
+        }
 
-            // Eliminar: el botón devuelve el token "__DELETE__"
-            case string s when s == "__DELETE__":
+        private async Task ManageStockAsync(Libro? libro)
+        {
+            if (libro is null) return;
+
+            var vm = new ManageStockDialogViewModel(libro, _service);
+            var view = new ManageStockDialog { DataContext = vm };
+
+            var result = await DialogHost.Show(view, "RootDialog");
+            if (result is ManageStockDialogViewModel m)
             {
-                Books.Remove(b);
-                CollectionViewSource.GetDefaultView(Books).Refresh();
-                break;
+                await m.GuardarCambiosAsync();
+                await LoadLibrosAsync();
             }
         }
-    }
 
-    private async Task DeleteBookAsync(Book? b)
-    {
-        if (b is null) return;
-
-        var view = new library.Dialogs.ConfirmDeleteBookDialog
+        // ===================== Filtro búsqueda =====================
+        private bool Filter(object obj)
         {
-            DataContext = b   // el diálogo bindea directamente al Book
-        };
+            if (obj is not Libro l) return false;
 
-        var result = await MaterialDesignThemes.Wpf.DialogHost.Show(view, "RootDialog");
-        if (result is bool ok && ok)
+            var t = _search.Trim();
+
+            // 🔎 Texto libre
+            if (!string.IsNullOrWhiteSpace(t))
+            {
+                if (!(Contains(l.Titulo, t) ||
+                      Contains(l.ISBN, t) ||
+                      Contains(l.Editorial, t) ||
+                      Contains(l.Categoria?.Nombre, t) || // ✅ ahora usa categoría
+                      (l.FechaPublicacion?.Year.ToString().Contains(t, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                      l.Autores.Any(a => Contains(a.Nombre, t))))
+                {
+                    return false;
+                }
+            }
+
+            // 📌 Filtro por categoría
+            if (SelectedCategoriaId > 0 && l.IdCategoria != SelectedCategoriaId)
+                return false;
+
+            // 📌 Filtro por rating mínimo
+            if (l.Opiniones.Any() && l.Opiniones.Average(o => o.Calificacion) < MinRating)
+                return false;
+
+            return true;
+        }
+
+        private static bool Contains(string? s, string term)
+            => !string.IsNullOrEmpty(s) && s.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+        public void SetSearch(string? text)
         {
-            Books.Remove(b);
-            CollectionViewSource.GetDefaultView(Books).Refresh();
+            _search = text ?? string.Empty;
+            LibrosView.Refresh();
+        }
+
+        // ===================== Agregar libro =====================
+        private async Task AddBookAsync()
+        {
+            var vm = new AddBookDialogViewModel();
+            var view = new AddBookDialog { DataContext = vm };
+
+            var result = await DialogHost.Show(view, "RootDialog");
+            if (result is AddBookDialogViewModel m)
+            {
+                var nuevo = m.ToLibro();
+                await _service.AddLibroCompletoAsync(nuevo);
+                await LoadLibrosAsync();
+            }
+        }
+
+        // ===================== Editar libro =====================
+        private async Task EditBookAsync(Libro? l)
+        {
+            if (l is null) return;
+
+            var vm = EditBookDialogViewModel.FromLibro(l);
+            var view = new EditBookDialog { DataContext = vm };
+
+            var result = await DialogHost.Show(view, "RootDialog");
+
+            if (result is EditBookDialogViewModel m)
+            {
+                var cloudService = new CloudinaryService(
+                    "dvw5h3ccw", // tu cloud name
+                    "893598289963378", // tu API key
+                    "mKNQQGTlypYx947y0F72jpnzb88" // tu API secret
+                );
+
+                string? portadaUrl = l.Portada;
+
+                // 📌 Solo si cargó nueva imagen local
+                if (!string.IsNullOrEmpty(m.PortadaUrl) && System.IO.File.Exists(m.PortadaUrl))
+                    portadaUrl = await cloudService.UploadImageAsync(m.PortadaUrl);
+
+                l.Titulo = m.Titulo ?? l.Titulo;
+                l.ISBN = m.Isbn ?? l.ISBN;
+                l.Editorial = m.Editorial ?? l.Editorial;
+                l.FechaPublicacion = m.FechaPublicacion ?? l.FechaPublicacion;
+                l.Sinopsis = m.Sinopsis ?? l.Sinopsis;
+                l.Portada = portadaUrl;
+                l.IdCategoria = m.SelectedCategoriaId > 0 ? m.SelectedCategoriaId : l.IdCategoria;
+
+                if (!string.IsNullOrWhiteSpace(m.AutoresTexto))
+                {
+                    l.Autores = m.AutoresTexto
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(a => new Autor { Nombre = a.Trim() })
+                        .ToList();
+                }
+
+                await _service.UpdateLibroAsync(l);
+                await LoadLibrosAsync();
+            }
+        }
+
+        private void GenerateReport()
+        {
+            MessageBox.Show($"📊 Reporte generado con {Libros.Count} libros.");
+        }
+
+        // ===================== Eliminar libro =====================
+        private async Task DeleteBookAsync(Libro? l)
+        {
+            if (l is null) return;
+
+            var vm = new ConfirmDeleteBookDialogViewModel(l);
+            var view = new ConfirmDeleteBookDialog { DataContext = vm };
+
+            var result = await DialogHost.Show(view, "RootDialog");
+            if (result is string action && action == "True")
+            {
+                await _service.DeleteLibroAsync(l.IdLibro);
+                await LoadLibrosAsync();
+            }
         }
     }
 }

@@ -4,123 +4,122 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              MinWidth="380" MaxWidth="420" MaxHeight="620">
 
-  <Border Padding="20"
-          Background="{DynamicResource App.SurfaceBrush}"
-          BorderBrush="{DynamicResource App.BorderBrush}"
-          BorderThickness="1"
-          CornerRadius="10"
-          Effect="{DynamicResource MaterialDesignElevation2}">
-    
-    <StackPanel>
-      <!-- HEADER -->
-      <DockPanel Margin="0,0,0,16">
-        <TextBlock Text="Notificaciones"
-                   FontSize="20"
-                   FontWeight="SemiBold"
-                   Foreground="{DynamicResource App.TextPrimaryBrush}"
-                   DockPanel.Dock="Left"/>
-       <Button DockPanel.Dock="Right"
-               Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-               Width="45"
-               HorizontalAlignment="Right"
-               ToolTip="Cerrar">
-         <materialDesign:PackIcon Kind="Close" Width="15" Height="15"/>
-       </Button>
+    <Border Padding="20"
+            Background="{DynamicResource App.SurfaceBrush}"
+            BorderBrush="{DynamicResource App.BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="10"
+            Effect="{DynamicResource MaterialDesignElevation2}">
 
-      </DockPanel>
-
-      <!-- SCROLLABLE LIST -->
-      <ScrollViewer VerticalScrollBarVisibility="Auto" Height="500">
         <StackPanel>
-          <!-- TODAY -->
-          <TextBlock Text="Hoy"
-                     FontSize="14"
-                     FontWeight="SemiBold"
-                     Foreground="{DynamicResource App.TextSecondaryBrush}"
-                     Margin="0,0,0,8"/>
+            <!-- HEADER -->
+            <DockPanel Margin="0,0,0,16">
+                <TextBlock Text="Notificaciones"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"
+                           DockPanel.Dock="Left"/>
+                <Button DockPanel.Dock="Right"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        Width="45"
+                        HorizontalAlignment="Right"
+                        ToolTip="Cerrar">
+                    <materialDesign:PackIcon Kind="Close" Width="15" Height="15"/>
+                </Button>
+            </DockPanel>
 
-          <ItemsControl ItemsSource="{Binding TodayNotifications}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Margin="0,0,0,10"
-                        Padding="10"
-                        Background="{DynamicResource Brush.Card}"
-                        CornerRadius="10">
-                  <Grid>
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="40"/>
-                      <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+            <!-- SCROLLABLE LIST -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="500">
+                <StackPanel>
+                    <!-- TODAY -->
+                    <TextBlock Text="Hoy"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource App.TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
 
-                    <!-- Avatar -->
-                    <Ellipse Width="32" Height="32" Grid.Column="0">
-                      <Ellipse.Fill>
-                        <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill"/>
-                      </Ellipse.Fill>
-                    </Ellipse>
+                    <ItemsControl ItemsSource="{Binding TodayNotifications}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,10"
+                                        Padding="10"
+                                        Background="{DynamicResource Brush.Card}"
+                                        CornerRadius="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                    <!-- Content -->
-                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                      <TextBlock>
-                        <Run Text="{Binding Title}" FontWeight="SemiBold"/>
-                        <Run Text=" "/>
-                        <Run Text="{Binding Message}"/>
-                      </TextBlock>
-                      <TextBlock Text="{Binding TimeAgo}"
-                                 FontSize="11"
-                                 Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+                                        <!-- Avatar -->
+                                        <Ellipse Width="32" Height="32" Grid.Column="0">
+                                            <Ellipse.Fill>
+                                                <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill"/>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
 
-          <!-- THIS WEEK -->
-          <TextBlock Text="Esta semana"
-                     FontSize="14"
-                     FontWeight="SemiBold"
-                     Foreground="{DynamicResource App.TextSecondaryBrush}"
-                     Margin="0,16,0,8"/>
+                                        <!-- Content -->
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock>
+                                                <Run Text="{Binding Titulo}" FontWeight="SemiBold"/>
+                                                <Run Text=" "/>
+                                                <Run Text="{Binding Mensaje}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding TimeAgo}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-          <ItemsControl ItemsSource="{Binding WeekNotifications}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Margin="0,0,0,10"
-                        Padding="10"
-                        Background="{DynamicResource Brush.Card}"
-                        CornerRadius="10">
-                  <Grid>
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="40"/>
-                      <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <!-- THIS WEEK -->
+                    <TextBlock Text="Esta semana"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource App.TextSecondaryBrush}"
+                               Margin="0,16,0,8"/>
 
-                    <!-- Avatar -->
-                    <Ellipse Width="32" Height="32" Grid.Column="0">
-                      <Ellipse.Fill>
-                        <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill"/>
-                      </Ellipse.Fill>
-                    </Ellipse>
+                    <ItemsControl ItemsSource="{Binding WeekNotifications}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,10"
+                                        Padding="10"
+                                        Background="{DynamicResource Brush.Card}"
+                                        CornerRadius="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                    <!-- Content -->
-                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                      <TextBlock>
-                        <Run Text="{Binding Title}" FontWeight="SemiBold"/>
-                        <Run Text=" "/>
-                        <Run Text="{Binding Message}"/>
-                      </TextBlock>
-                      <TextBlock Text="{Binding TimeAgo}"
-                                 FontSize="11"
-                                 Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+                                        <!-- Avatar -->
+                                        <Ellipse Width="32" Height="32" Grid.Column="0">
+                                            <Ellipse.Fill>
+                                                <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill"/>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
+
+                                        <!-- Content -->
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock>
+                                                <Run Text="{Binding Titulo}" FontWeight="SemiBold"/>
+                                                <Run Text=" "/>
+                                                <Run Text="{Binding Mensaje}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding TimeAgo}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
         </StackPanel>
-      </ScrollViewer>
-    </StackPanel>
-  </Border>
+    </Border>
 </UserControl>

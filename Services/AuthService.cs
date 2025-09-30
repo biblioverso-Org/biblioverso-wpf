@@ -1,84 +1,47 @@
+using BCrypt.Net;
 using library.Data;
 using library.Models;
 using library.Services;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
-using BCrypt.Net;
+using System.Text.Json;
+
 
 namespace library.Services
 {
     public class AuthService : IAuthService
     {
         private readonly Conexion _conexion;
+        private readonly HttpClient _http;
+        private const string BaseUrl = "http://localhost:4000/api/v1";
 
         public AuthService(Conexion conexion)
         {
             _conexion = conexion;
+            _http = new HttpClient();
         }
 
         public async Task<Usuario?> LoginAsync(string username, string password)
         {
             try
             {
-                using var connection = _conexion.CrearConexion();
-                await connection.OpenAsync();
-
-                // Buscar por username o email
-                var query = @"
-                    SELECT u.id_usuario, u.cl_usuario, u.usuario, u.password, u.nombre, u.apellido, 
-                           u.email, u.telefono, u.direccion, u.genero, u.fecha_nac, u.nacionalidad, 
-                           u.biografia, u.foto, u.id_rol, u.fecha_creacion, u.fecha_actualizacion,
-                           r.nombre as rol_nombre, r.descripcion as rol_descripcion
-                    FROM usuario u
-                    LEFT JOIN rol r ON u.id_rol = r.id_rol
-                    WHERE u.usuario = @username OR u.email = @username";
-
-                using var command = new NpgsqlCommand(query, connection);
-                command.Parameters.AddWithValue("@username", username);
-
+                using var connection = _conexion.CrearConexion(); 
+                await connection.OpenAsync(); // Buscar por username o email
+                var query = @" SELECT u.id_usuario, u.cl_usuario, u.usuario, u.password, u.nombre, u.apellido, u.email, u.telefono, u.direccion, u.genero, u.fecha_nac, u.nacionalidad, u.biografia, u.foto, u.id_rol, u.fecha_creacion, u.fecha_actualizacion, r.nombre as rol_nombre, r.descripcion as rol_descripcion FROM usuario u LEFT JOIN rol r ON u.id_rol = r.id_rol WHERE u.usuario = @username OR u.email = @username";
+                using var command = new NpgsqlCommand(query, connection); 
+                command.Parameters.AddWithValue("@username", username); 
                 using var reader = await command.ExecuteReaderAsync();
-
-                if (await reader.ReadAsync())
-                {
-                    var usuario = MapReaderToUsuario(reader);
-
-                    // Verificar contraseña
+                if (await reader.ReadAsync()) 
+                { var usuario = MapReaderToUsuario(reader); 
                     var storedPassword = reader["password"]?.ToString();
-
-                    if (!string.IsNullOrEmpty(storedPassword))
-                    {
-                        // Verificar si la contraseña está hasheada con BCrypt o es texto plano
-                        bool isValidPassword = false;
-
-                        try
-                        {
-                            // Intentar verificar con BCrypt primero
-                            isValidPassword = BCrypt.Net.BCrypt.Verify(password, storedPassword);
-                        }
-                        catch
-                        {
-                            // Si falla BCrypt, comparar como texto plano (para migración)
-                            isValidPassword = password == storedPassword;
-                        }
-
-                        if (isValidPassword)
-                        {
-                            return usuario;
-                        }
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error en LoginAsync: {ex.Message}");
-                throw new Exception($"Error al autenticar usuario: {ex.Message}", ex);
-            }
-        }
-
+                    if (!string.IsNullOrEmpty(storedPassword)) 
+                    {  bool isValidPassword = false; try {  isValidPassword = BCrypt.Net.BCrypt.Verify(password, storedPassword); } 
+                        catch { isValidPassword = password == storedPassword; } if (isValidPassword) { return usuario; } } } return null; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Error en LoginAsync: {ex.Message}"); throw new Exception($"Error al autenticar usuario: {ex.Message}", ex); } }
         public async Task<Usuario?> GetUsuarioByIdAsync(int id)
         {
             try

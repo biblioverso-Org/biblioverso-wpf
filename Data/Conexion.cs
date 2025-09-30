@@ -30,8 +30,15 @@ namespace library.Data
             }
         }
 
-        
-        
+        private async Task<NpgsqlConnection> GetConnectionAsync()
+        {
+            var conn = new NpgsqlConnection(ConnectionString);
+            await conn.OpenAsync();
+            return conn;
+        }
+
+
+
         public async Task<int> ExecuteNonQueryAsync(string query, NpgsqlParameter[]? parameters = null)
         {
             using var connection = CrearConexion();
@@ -44,6 +51,30 @@ namespace library.Data
             }
             
             return await command.ExecuteNonQueryAsync();
+        }
+
+
+        public async Task<NpgsqlDataReader> ExecuteReaderAsync(string query, NpgsqlParameter[]? parameters = null)
+        {
+            var connection = CrearConexion();
+            await connection.OpenAsync();
+
+            var command = new NpgsqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters);
+
+            // Importante: usamos CommandBehavior.CloseConnection para que cierre al terminar
+            return await command.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
+        }
+
+        public async Task<object?> ExecuteScalarAsync(string query, params NpgsqlParameter[] parameters)
+        {
+            using var conn = await GetConnectionAsync();
+            using var cmd = new NpgsqlCommand(query, conn);
+            if (parameters != null)
+                cmd.Parameters.AddRange(parameters);
+
+            return await cmd.ExecuteScalarAsync();
         }
 
     }

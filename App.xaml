@@ -13,8 +13,8 @@
                 <!-- 2) Tema por defecto (elige Light o Dark como arranque) -->
                 <ResourceDictionary Source="Resources/Themes/Theme.Light.xaml"/>
 
-                 <ResourceDictionary Source="Resources/Themes/CustomersTable.Styles.xaml"/>
-     
+                <ResourceDictionary Source="Resources/Themes/CustomersTable.Styles.xaml"/>
+
                 <!-- 3) Estilos de controles de tu app -->
                 <ResourceDictionary Source="Resources/Colors.xaml"/>
                 <ResourceDictionary Source="Resources/Styles.xaml"/>

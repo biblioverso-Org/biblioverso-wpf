@@ -6,446 +6,482 @@
              xmlns:converters="clr-namespace:library.Converters"
              MinWidth="560" MaxWidth="720" MaxHeight="525">
 
-  <!-- ========== RESOURCES ========== -->
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <!-- Tus estilos de tabla (ya referenciados a llaves dinámicas) -->
-        <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
-      </ResourceDictionary.MergedDictionaries>
+    <!-- ========== RESOURCES ========== -->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-      <converters:SafeImageSourceConverter x:Key="SafeImg"/>
-      <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <converters:SafeImageSourceConverter x:Key="SafeImg"/>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <converters:DistDiffToBrushConverter x:Key="DistDiffToBrush"/>
 
-      <!-- Card de sugerencia -->
-      <DataTemplate x:Key="SuggestionCardTemplate">
-        <Border Padding="12" Margin="8,6" CornerRadius="12"
+
+            <!-- Card de sugerencia -->
+            <DataTemplate x:Key="SuggestionCardTemplate">
+                <Border Padding="12" Margin="8,6" CornerRadius="12"
                 Background="{DynamicResource App.CardBrush}"
                 BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1"
                 HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="72"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="72"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-            <!-- Cover -->
-            <Border Width="56" Height="84" CornerRadius="6"
+                        <!-- Cover -->
+                        <Border Width="56" Height="84" CornerRadius="6"
                     BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1">
-              <Border.Background>
-                <ImageBrush Stretch="UniformToFill"
-                            ImageSource="{Binding CoverPath, Converter={StaticResource SafeImg}}"/>
-              </Border.Background>
-            </Border>
+                            <Border.Background>
+                                <ImageBrush Stretch="UniformToFill"
+                            ImageSource="{Binding Portada, Converter={StaticResource SafeImg}}"/>
+                            </Border.Background>
+                        </Border>
 
-            <!-- Info + Rating + Botón -->
-            <StackPanel Grid.Column="1" Margin="12,2,0,2">
-              <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14"
+                        <!-- Info + Rating + Botón -->
+                        <StackPanel Grid.Column="1" Margin="12,2,0,2">
+                            <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" FontSize="14"
                          Foreground="{DynamicResource App.TextPrimaryBrush}"
                          TextTrimming="CharacterEllipsis"/>
-              <TextBlock Text="{Binding Author}" FontSize="12" Margin="0,2,0,6"
+                            <TextBlock Text="{Binding AutoresTexto}" FontSize="12" Margin="0,2,0,6"
                          Foreground="{DynamicResource App.TextSecondaryBrush}"
                          TextTrimming="CharacterEllipsis"/>
 
-              <StackPanel Orientation="Horizontal">
-                <mah:PackIconMaterial Kind="Star" Width="14" Height="14"
+                            <StackPanel Orientation="Horizontal">
+                                <mah:PackIconMaterial Kind="Star" Width="14" Height="14"
                                       Foreground="{DynamicResource App.WarningBrush}"
                                       Margin="0,0,6,0"/>
-                <TextBlock Text="{Binding Rating, StringFormat={}{0:0.0}}"
+                                <TextBlock Text="{Binding Rating, StringFormat={}{0:0.0}}"
                            Foreground="{DynamicResource App.TextPrimaryBrush}"
                            FontSize="12"/>
-              </StackPanel>
+                            </StackPanel>
 
-              <Button Margin="0,8,0,0" Padding="10,6" MinWidth="120" HorizontalAlignment="Left"
+                            <Button Margin="0,8,0,0" Padding="10,6" MinWidth="120" HorizontalAlignment="Left"
                       Command="{Binding DataContext.SelectSuggestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                       CommandParameter="{Binding}">
-                <StackPanel Orientation="Horizontal">
-                  <mah:PackIconMaterial Kind="PlusBoxOutline" Width="18" Height="18" Margin="0,0,6,0"/>
-                  <TextBlock Text="Agregar"/>
-                </StackPanel>
-              </Button>
-            </StackPanel>
-          </Grid>
-        </Border>
-      </DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <mah:PackIconMaterial Kind="PlusBoxOutline" Width="18" Height="18" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Agregar"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DataTemplate>
 
-      <!-- Paso 2: Detalles -->
-      <DataTemplate x:Key="DetailsTemplate">
+            
+            <!-- Paso 2: Detalles -->
+            <DataTemplate x:Key="DetailsTemplate">
+                <Grid Margin="0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Portada -->
+                    <Border Grid.Column="0" Width="220" Height="320" CornerRadius="10"
+                BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1"
+                Background="{DynamicResource App.ElevatedBrush}" VerticalAlignment="Top">
+                        <Image Source="{Binding Portada, Converter={StaticResource SafeImg}}" Stretch="UniformToFill"/>
+                    </Border>
+
+                    <!-- Formulario -->
+                    <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+
+                            <!-- Bloque 1: Identificación -->
+                            <TextBlock Text="📖 Identificación" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel Width="180">
+                                    <TextBlock Text="ISBN" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <TextBox Text="{Binding Isbn}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Width="120" Margin="12,0,0,0">
+                                    <TextBlock Text="Año de publicación" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <TextBox Text="{Binding FechaPublicacion, StringFormat={}{0:yyyy}}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Bloque 2: Detalles básicos -->
+                            <TextBlock Text="📌 Detalles" FontWeight="Bold" Margin="0,6,0,6"/>
+                            <TextBlock Text="Título" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                            <TextBox Text="{Binding Titulo}" Margin="0,2,0,8"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel Width="180">
+                                    <TextBlock Text="Autores" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <TextBox Text="{Binding AutoresTexto}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Width="120" Margin="12,0,0,0">
+                                    <TextBlock Text="Calificación" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                        <TextBlock Text="{Binding Rating}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource App.WarningBrush}" Margin="0,0,6,0"/>
+                                        <mah:PackIconMaterial Kind="Star" Width="16" Height="16"
+                                                  Foreground="{DynamicResource App.WarningBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Bloque 3: Clasificación -->
+                            <!-- Clasificación -->
+                            <TextBlock Text="🏷️ Clasificación" FontWeight="Bold" Margin="0,6,0,6"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel Width="180">
+                                    <TextBlock Text="Categoría" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <ComboBox ItemsSource="{Binding Categorias}"
+                  DisplayMemberPath="Nombre"
+                  SelectedValuePath="IdCategoria"
+                  SelectedValue="{Binding SelectedCategoriaId}"
+                  Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Width="180" Margin="12,0,0,0">
+                                    <TextBlock Text="Editorial" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                                    <TextBox Text="{Binding Editorial}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
+
+                            <!-- Bloque 4: Stock -->
+                            <TextBlock Text="📦 Disponibilidad" FontWeight="Bold" Margin="0,6,0,6"/>
+                            <TextBlock Text="Cantidad en stock" FontSize="12" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                            <TextBox Text="{Binding Stock, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+
+                            <!-- Bloque 5: Sinopsis -->
+                            <TextBlock Text="📝 Sinopsis" FontWeight="Bold" Margin="0,6,0,6"/>
+                            <TextBox Text="{Binding Sinopsis}" Height="120"
+                         AcceptsReturn="True" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Paso 3: Distribución por estado -->
+           
+            <DataTemplate x:Key="DistributionTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tarjetas de estados -->
+                    <UniformGrid Grid.Column="0" Columns="3" Rows="2" Margin="0,0,10,0">
+
+                        <!-- Nuevo -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookPlus" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.PrimaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Nuevo" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistNew, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Usado -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookOpenVariant" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.PrimaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Usado" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistUsed, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Desgastado -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookClock" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.WarningBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Desgastado" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistWorn, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Dañado -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookCancel" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.ErrorBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Dañado" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistDamaged, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Reparado -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookCheck" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.SuccessBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Reparado" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistRepaired, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- En restauración -->
+                        <Border Padding="12" Margin="6" CornerRadius="10"
+                    Background="{DynamicResource App.CardBrush}"
+                    BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <mah:PackIconMaterial Kind="BookCog" Width="28" Height="28" 
+                                          Foreground="{DynamicResource App.PrimaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="En restauración" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding DistRestoring, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Cantidad"/>
+                            </StackPanel>
+                        </Border>
+
+                    </UniformGrid>
+
+                    <!-- Resumen -->
+                    <Border Grid.Column="2" Padding="16" CornerRadius="10"
+                Background="{DynamicResource App.CardBrush}"
+                BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Resumen" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                                <TextBlock Text="📦 Stock declarado:" Width="160"/>
+                                <TextBlock Text="{Binding Stock}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                                <TextBlock Text="✅ Total asignado:" Width="160"/>
+                                <TextBlock Text="{Binding DistTotal}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                <TextBlock Text="⚖ Diferencia:" Width="160"/>
+                                <TextBlock Text="{Binding DistDiff}" 
+                               FontWeight="SemiBold"
+                               Foreground="{Binding DistDiff, Converter={StaticResource DistDiffToBrush}}"/>
+                            </StackPanel>
+
+                            <TextBlock Margin="0,12,0,0" FontSize="12"
+                           Foreground="{DynamicResource App.TextSecondaryBrush}"
+                           Text="⚠ La diferencia debe ser 0 para poder guardar."/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- ========== CONTENT ========== -->
+    <Border Padding="22" Background="{DynamicResource App.CardBrush}">
         <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260"/>
-            <ColumnDefinition Width="20"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-
-          <!-- Portada centrada -->
-          <Grid Grid.Column="0" VerticalAlignment="Center">
-            <Border Width="220" Height="320" CornerRadius="10"
-                    BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1"
-                    Background="{DynamicResource App.ElevatedBrush}">
-              
-            </Border>
-          </Grid>
-
-          <!-- Formulario -->
-          <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-              </Grid.RowDefinitions>
-
-              <!-- Row 0 -->
-              <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,8,10"
-                       materialDesign:HintAssist.Hint="ISBN"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Isbn}"/>
-              <TextBox Grid.Row="0" Grid.Column="1" Margin="8,0,0,10"
-                       materialDesign:HintAssist.Hint="Año"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Year}"/>
-
-              <!-- Row 1 -->
-              <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,8,10"
-                       materialDesign:HintAssist.Hint="Título"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Title}"/>
-              <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0,0,10"
-                       materialDesign:HintAssist.Hint="Cantidad (stock)"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Stock, UpdateSourceTrigger=PropertyChanged}"/>
-
-              <!-- Row 2: Autor + Nuevo / Calificación -->
-              <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,8,10">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0"
-                         materialDesign:HintAssist.Hint="Autor"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"
-                         Text="{Binding Author}"/>
-                <Button Grid.Column="1" Margin="10,0,0,0"
-                        Command="{Binding CreateAuthorCommand}">
-                  <StackPanel Orientation="Horizontal">
-                    <mah:PackIconMaterial Kind="Plus" Width="16" Height="16" Margin="0,0,6,0"/>
-                    <TextBlock Text="Nuevo"/>
-                  </StackPanel>
-                </Button>
-              </Grid>
-              <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0,0,10"
-                       materialDesign:HintAssist.Hint="Calificación"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Rating}"/>
-
-              <!-- Row 3: Género / Disponible -->
-              <ComboBox Grid.Row="3" Grid.Column="0" Margin="0,0,8,10"
-                        ItemsSource="{Binding GenreItems}"
-                        SelectedValuePath="Key" DisplayMemberPath="Value"
-                        SelectedValue="{Binding SelectedGenre, Mode=TwoWay}"
-                        materialDesign:HintAssist.Hint="Género"/>
-              <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="8,6,0,10">
-                <CheckBox IsChecked="{Binding Available}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <TextBlock Text="Disponible" VerticalAlignment="Center"
-                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-              </StackPanel>
-
-              <!-- Row 4: Editorial / Estado -->
-              <TextBox Grid.Row="4" Grid.Column="0" Margin="0,0,8,10"
-                       materialDesign:HintAssist.Hint="Editorial"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Publisher}"/>
-              <ComboBox Grid.Row="4" Grid.Column="1" Margin="8,0,0,10"
-                        ItemsSource="{Binding ConditionItems}"
-                        SelectedValuePath="Key" DisplayMemberPath="Value"
-                        SelectedValue="{Binding ConditionKey, Mode=TwoWay}"
-                        materialDesign:HintAssist.Hint="Estado"/>
-
-              <!-- Row 5: URL imagen -->
-              <TextBox Grid.Row="5" Grid.ColumnSpan="2" Margin="0,0,0,10"
-                       materialDesign:HintAssist.Hint="URL de la imagen"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding CoverUrl, UpdateSourceTrigger=PropertyChanged}"/>
-
-              <!-- Row 6: Sinopsis -->
-              <TextBox Grid.Row="6" Grid.ColumnSpan="2" Height="100"
-                       AcceptsReturn="True" TextWrapping="Wrap"
-                       materialDesign:HintAssist.Hint="Sinopsis"
-                       Foreground="{DynamicResource App.TextPrimaryBrush}"
-                       Text="{Binding Synopsis}"/>
-
-              <!-- Row 7: Distribución -->
-              <Button Grid.Row="7" Grid.ColumnSpan="2" Margin="0,10,0,0"
-                      Command="{Binding OpenDistributionCommand}">
-                <StackPanel Orientation="Horizontal">
-                  <mah:PackIconMaterial Kind="TransitConnectionVariant" Width="18" Height="18" Margin="0,0,8,0"/>
-                  <TextBlock Text="Distribución por estado"/>
-                </StackPanel>
-              </Button>
-            </Grid>
-          </ScrollViewer>
-        </Grid>
-      </DataTemplate>
-
-      <!-- Paso 3: Distribución por estado -->
-      <DataTemplate x:Key="DistributionTemplate">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="20"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-
-          <!-- Campos -->
-          <StackPanel Grid.Column="0">
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="Nuevo"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistNew, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="Usado"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistUsed, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="Desgastado"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistWorn, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="Dañado"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistDamaged, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="Reparado"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistRepaired, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Margin="0,0,0,10" materialDesign:HintAssist.Hint="En restauración"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="{Binding DistRestoring, UpdateSourceTrigger=PropertyChanged}"/>
-          </StackPanel>
-
-          <!-- Resumen -->
-          <Border Grid.Column="2" Padding="16" CornerRadius="10"
-                  Background="{DynamicResource App.CardBrush}"
-                  BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
-            <StackPanel>
-              <TextBlock Text="Resumen" FontWeight="SemiBold" Margin="0,0,0,10"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-
-              <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                <TextBlock Text="Stock declarado:" Width="150"
-                           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding Stock, Mode=OneWay}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                <TextBlock Text="Total asignado:" Width="150"
-                           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding DistTotal, Mode=OneWay}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                <TextBlock Text="Diferencia:" Width="150"
-                           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding DistDiff, Mode=OneWay}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-              </StackPanel>
-
-              <TextBlock Margin="0,8,0,0" FontSize="12"
-                         Text="La diferencia debe ser 0 para poder guardar."
-                         Foreground="{DynamicResource App.TextMutedBrush}"/>
-            </StackPanel>
-          </Border>
-        </Grid>
-      </DataTemplate>
-
-    </ResourceDictionary>
-  </UserControl.Resources>
-
-  <!-- ========== CONTENT ========== -->
-  <Border Padding="22" Background="{DynamicResource App.CardBrush}">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
-
-      <!-- Título -->
-      <TextBlock Grid.Row="0" Text="Agregar libro"
-                 FontSize="20" FontWeight="SemiBold"
-                 Foreground="{DynamicResource App.TextPrimaryBrush}"
-                 Margin="4,0,4,10"/>
-
-      <!-- Stepper -->
-      <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
-        <TextBlock Text="1. Buscar" Margin="0,0,10,0" VerticalAlignment="Center">
-          <TextBlock.Style>
-            <Style TargetType="TextBlock">
-              <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding StepIndex}" Value="0">
-                  <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-
-        <mah:PackIconMaterial Kind="ChevronRight" Width="18" Height="18" VerticalAlignment="Center"
-                              Foreground="{DynamicResource App.TextMutedBrush}" Margin="0,0,8,0"/>
-
-        <TextBlock Text="2. Detalles" Margin="0,0,10,0" VerticalAlignment="Center">
-          <TextBlock.Style>
-            <Style TargetType="TextBlock">
-              <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding StepIndex}" Value="1">
-                  <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-
-        <mah:PackIconMaterial Kind="ChevronRight" Width="18" Height="18" VerticalAlignment="Center"
-                              Foreground="{DynamicResource App.TextMutedBrush}" Margin="0,0,8,0"/>
-
-        <TextBlock Text="3. Distribución" VerticalAlignment="Center">
-          <TextBlock.Style>
-            <Style TargetType="TextBlock">
-              <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding StepIndex}" Value="2">
-                  <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-      </StackPanel>
-
-      <!-- Contenido con transición -->
-      <materialDesign:Transitioner Grid.Row="2" SelectedIndex="{Binding StepIndex}">
-        <!-- Paso 1 -->
-        <materialDesign:TransitionerSlide>
-          <Grid>
             <Grid.RowDefinitions>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Buscador -->
-            <Border Grid.Row="0" CornerRadius="10" Padding="12" Margin="0,0,0,10"
+            <!-- Título -->
+            <TextBlock Grid.Row="0" Text="Agregar libro"
+                 FontSize="20" FontWeight="SemiBold"
+                 Margin="4,0,4,10"/>
+
+            <!-- Stepper -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="1. Buscar" Margin="0,0,10,0" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StepIndex}" Value="0">
+                                    <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <mah:PackIconMaterial Kind="ChevronRight" Width="18" Height="18" VerticalAlignment="Center"
+                              Margin="0,0,8,0"/>
+
+                <TextBlock Text="2. Detalles" Margin="0,0,10,0" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StepIndex}" Value="1">
+                                    <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <mah:PackIconMaterial Kind="ChevronRight" Width="18" Height="18" VerticalAlignment="Center"
+                              Margin="0,0,8,0"/>
+
+                <TextBlock Text="3. Distribución" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource App.TextSecondaryBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StepIndex}" Value="2">
+                                    <Setter Property="Foreground" Value="{DynamicResource App.PrimaryBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Contenido -->
+            <materialDesign:Transitioner Grid.Row="2" SelectedIndex="{Binding StepIndex}">
+                <materialDesign:TransitionerSlide>
+                    <!-- Paso 1 -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Buscador -->
+                        <Border Grid.Row="0" CornerRadius="10" Padding="12" Margin="0,0,0,10"
                     Background="{DynamicResource App.ElevatedBrush}"
                     BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1">
-              <DockPanel LastChildFill="True">
-                <mah:PackIconMaterial Kind="Magnify" Width="20" Height="20"
-                                      Foreground="{DynamicResource App.IconBrush}" Margin="0,0,8,0"/>
-                <TextBox BorderThickness="0" Background="Transparent"
-                         Foreground="{DynamicResource App.TextPrimaryBrush}"
+                            <DockPanel LastChildFill="True">
+                                <mah:PackIconMaterial Kind="Magnify" Width="20" Height="20" Margin="0,0,8,0"/>
+                                <TextBox BorderThickness="0" Background="Transparent"
                          FontSize="14"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          materialDesign:HintAssist.Hint="Buscar título, autor o ISBN…"/>
-              </DockPanel>
-            </Border>
+                            </DockPanel>
+                        </Border>
 
-            <!-- Lista de sugerencias -->
-            <ListBox Grid.Row="1"
+                        <!-- Lista -->
+                        <ListBox Grid.Row="1"
                      ItemsSource="{Binding SuggestionsView}"
                      ItemTemplate="{StaticResource SuggestionCardTemplate}"
                      BorderThickness="0" Background="Transparent"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-              <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                  <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                  <Setter Property="Padding" Value="0"/>
-                  <Setter Property="Focusable" Value="False"/>
-                </Style>
-              </ListBox.ItemContainerStyle>
-            </ListBox>
-          </Grid>
-        </materialDesign:TransitionerSlide>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Focusable" Value="False"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Grid>
+                </materialDesign:TransitionerSlide>
 
-        <!-- Paso 2 -->
-        <materialDesign:TransitionerSlide>
-          <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DetailsTemplate}"/>
-        </materialDesign:TransitionerSlide>
+                <!-- Paso 2 -->
+                <materialDesign:TransitionerSlide>
+                    <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DetailsTemplate}"/>
+                </materialDesign:TransitionerSlide>
 
-        <!-- Paso 3 -->
-        <materialDesign:TransitionerSlide>
-          <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DistributionTemplate}"/>
-        </materialDesign:TransitionerSlide>
-      </materialDesign:Transitioner>
+                <!-- Paso 3 -->
+                <materialDesign:TransitionerSlide>
+                    <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DistributionTemplate}"/>
+                </materialDesign:TransitionerSlide>
+            </materialDesign:Transitioner>
 
-      <!-- Footer -->
-      <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,16,0,0">
+            <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,16,0,0">
 
-        <!-- Atrás -->
-        <Button DockPanel.Dock="Left" Command="{Binding BackCommand}">
-          <Button.Style>
-            <Style TargetType="Button">
-              <Setter Property="Visibility" Value="Collapsed"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding StepIndex}" Value="1">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StepIndex}" Value="2">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </Button.Style>
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="ArrowLeft" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Atrás"/>
-          </StackPanel>
-        </Button>
+                <!-- Atrás -->
+                <Button DockPanel.Dock="Left" Command="{Binding BackCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <!-- Mostrar en paso 1 (Detalles) -->
+                                <DataTrigger Binding="{Binding StepIndex}" Value="1">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <!-- Mostrar en paso 2 (Distribución) -->
+                                <DataTrigger Binding="{Binding StepIndex}" Value="2">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <mah:PackIconMaterial Kind="ArrowLeft" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Atrás"/>
+                    </StackPanel>
+                </Button>
 
-        <!-- Guardar -->
-        <Button DockPanel.Dock="Right"
-                IsEnabled="{Binding CanSave}"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{Binding}">
-          <Button.Style>
-            <Style TargetType="Button">
-              <Setter Property="Visibility" Value="Collapsed"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding StepIndex}" Value="1">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StepIndex}" Value="2">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </Button.Style>
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="ContentSaveOutline" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Guardar"/>
-          </StackPanel>
-        </Button>
 
-        <!-- Cancelar (solo paso 0) -->
-        <Button DockPanel.Dock="Right" Margin="8,0,0,0"
-                Visibility="{Binding IsStepSearch, Converter={StaticResource BoolToVis}}"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Null}">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Cancelar"/>
-          </StackPanel>
-        </Button>
+                <!-- Siguiente (solo paso 1: Detalles) -->
+                <Button DockPanel.Dock="Right"
+            Margin="8,0,0,0"
+            Command="{Binding OpenDistributionCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StepIndex}" Value="1">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <mah:PackIconMaterial Kind="ArrowRight" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Siguiente"/>
+                    </StackPanel>
+                </Button>
 
-      </DockPanel>
+                <!-- Guardar (solo paso 2: Distribución) -->
+                <Button DockPanel.Dock="Right"
+            Margin="8,0,0,0"
+            IsEnabled="{Binding CanSave}"
+            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+            CommandParameter="{Binding}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StepIndex}" Value="2">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <mah:PackIconMaterial Kind="ContentSaveOutline" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Guardar"/>
+                    </StackPanel>
+                </Button>
 
-    </Grid>
-  </Border>
+                <!-- Cancelar (solo paso 0) -->
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+            Visibility="{Binding IsStepSearch, Converter={StaticResource BoolToVis}}"
+            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+            CommandParameter="{x:Null}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
+
+            </DockPanel>
+
+        </Grid>
+    </Border>
 </UserControl>

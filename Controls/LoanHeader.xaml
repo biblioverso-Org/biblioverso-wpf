@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="library.Controls.LoanHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             x:Name="root">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!-- Header -->
+    <Grid Margin="10,10,10,6">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <!-- Título -->
+            <ColumnDefinition Width="Auto" />
+            <!-- Filtros -->
+            <ColumnDefinition Width="Auto" />
+            <!-- Acciones -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Izquierda: título -->
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="0"
+                    VerticalAlignment="Center">
+            <TextBlock Text="Préstamos"
+                       FontWeight="SemiBold"
+                       FontSize="16"
+                       Foreground="{StaticResource TitleFg}"
+                       Margin="0,0,6,0" />
+            <mah:PackIconMaterial Kind="ArrowTopRight"
+                                  Width="12" Height="12"
+                                  VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Centro: filtros -->
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Margin="20,0,20,0">
+           
+            <!-- Estado -->
+            <ComboBox Width="160" Margin="0,0,8,0"
+                      SelectedValue="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBoxItem Content="Todos" Tag="all"/>
+                <ComboBoxItem Content="Activo" Tag="activo"/>
+                <ComboBoxItem Content="Devuelto" Tag="devuelto"/>
+                <ComboBoxItem Content="Vencido" Tag="vencido"/>
+            </ComboBox>
+
+            <!-- Rango de fechas -->
+            <DatePicker Width="140" Margin="0,0,8,0"
+                        SelectedDate="{Binding DateFrom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        materialDesign:HintAssist.Hint="Desde" />
+            <DatePicker Width="140"
+                        SelectedDate="{Binding DateTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        materialDesign:HintAssist.Hint="Hasta" />
+        </StackPanel>
+
+        <!-- Derecha: acciones -->
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right">
+            <Button Command="{Binding GenerateLoansReportCommand}"
+                    >
+                <StackPanel Orientation="Horizontal">
+                    <mah:PackIconMaterial Kind="FileChartOutline"
+                                          Width="18" Height="18"
+                                          Margin="0,0,8,0"/>
+                    <TextBlock Text="Generar reporte"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

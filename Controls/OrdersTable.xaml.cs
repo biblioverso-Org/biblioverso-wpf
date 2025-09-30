@@ -1,11 +1,14 @@
 using System.Windows.Controls;
+using library.ViewModels;
 
-namespace library.Controls;
-
-public partial class OrdersTable : UserControl
+namespace library.Controls
 {
-    public OrdersTable()
+    public partial class OrdersTable : UserControl
     {
-        InitializeComponent();
+        public OrdersTable()
+        {
+            InitializeComponent();
+            DataContext = new OrdersViewModel(); 
+        }
     }
 }

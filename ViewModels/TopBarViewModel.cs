@@ -28,14 +28,15 @@ namespace library.ViewModels
         // Usuario actual (del sistema de autenticación)
         public Usuario? CurrentUser { get; private set; }
 
-        public IAsyncRelayCommand<Customer?> EditUserCommand { get; }
+        // Ahora el comando trabaja con Usuario, no con Customer
+        public IAsyncRelayCommand<Usuario?> EditUserCommand { get; }
 
         public bool HasNotifications => NotificationsCount > 0;
         partial void OnNotificationsCountChanged(int value) => OnPropertyChanged(nameof(HasNotifications));
 
         public TopBarViewModel()
         {
-            EditUserCommand = new AsyncRelayCommand<Customer?>(OpenEditProfileAsync);
+            EditUserCommand = new AsyncRelayCommand<Usuario?>(OpenEditProfileAsync);
             IsDarkTheme = ThemeService.IsDark;
         }
 
@@ -44,6 +45,7 @@ namespace library.ViewModels
             _userSessionService = userSessionService;
         }
 
+        // ==================== Actualizar datos del usuario ====================
         public void UpdateUserInfo(Usuario usuario)
         {
             CurrentUser = usuario;
@@ -53,14 +55,15 @@ namespace library.ViewModels
 
             // Generar iniciales
             var names = usuario.DisplayName.Split(' ');
-            UserInitials = names.Length >= 2 
+            UserInitials = names.Length >= 2
                 ? $"{names[0][0]}{names[1][0]}".ToUpper()
-                : usuario.DisplayName.Length > 0 
+                : usuario.DisplayName.Length > 0
                     ? usuario.DisplayName.Substring(0, Math.Min(2, usuario.DisplayName.Length)).ToUpper()
                     : "U";
         }
 
-        private async Task OpenEditProfileAsync(Customer? customer)
+        // ==================== Editar perfil ====================
+        private async Task OpenEditProfileAsync(Usuario? usuario)
         {
             if (CurrentUser == null)
             {
@@ -68,27 +71,16 @@ namespace library.ViewModels
                 return;
             }
 
-            // Convertir Usuario a Customer para el diálogo (adaptación temporal)
-            var userAsCustomer = new Customer
-            {
-                FirstName = CurrentUser.Nombre ?? "Sin nombre",
-                LastName = CurrentUser.Apellido ?? "Sin apellido",
-                Email = CurrentUser.Email ?? "Sin email",
-                Phone = CurrentUser.Telefono ?? "Sin teléfono",
-                Address = CurrentUser.Direccion ?? "Sin dirección",
-                PhotoPath = CurrentUser.Foto
-            };
-
-            var target = customer ?? userAsCustomer;
+            var target = usuario ?? CurrentUser;
 
             var vm = new EditProfileDialogViewModel
             {
-                FirstName = target.FirstName,
-                LastName = target.LastName,
-                Email = target.Email,
-                Phone = target.Phone,
-                Address = target.Address,
-                PhotoPath = target.PhotoPath,
+                Nombre = target.Nombre ?? "",
+                Apellido = target.Apellido ?? "",
+                Email = target.Email ?? "",
+                Telefono = target.Telefono ?? "",
+                Direccion = target.Direccion ?? "",
+                Foto = target.Foto
             };
 
             var view = new EditProfileDialog { DataContext = vm };
@@ -99,12 +91,12 @@ namespace library.ViewModels
 
                 if (result is EditProfileDialogViewModel saved)
                 {
-                    MessageBox.Show($"Perfil actualizado: {saved.FirstName} {saved.LastName}\n\n" +
+                    MessageBox.Show($"Perfil actualizado: {saved.Nombre} {saved.Apellido}\n\n" +
                                     $"ID Usuario: {CurrentUser.IdUsuario}\n" +
                                     $"Rol: {CurrentUser.RolDisplay}");
 
                     // TODO: Aquí deberías actualizar el usuario en la base de datos
-                    // usando IAuthService.UpdateUsuarioAsync()
+                    // usando IUserService.UpdateUsuarioAsync(saved)
                 }
             }
             catch (Exception ex)
@@ -113,15 +105,18 @@ namespace library.ViewModels
             }
         }
 
+        // ==================== Notificaciones ====================
         [RelayCommand]
         private async Task OpenNotifications()
         {
             var vm = new NotificationsViewModel();
-            var view = new NotificationsDialog { DataContext = vm };
+            await vm.CargarNotificacionesAsync();
 
-            await DialogHost.Show(view, "RootDialog");
+            var dialog = new NotificationsDialog { DataContext = vm };
+            await DialogHost.Show(dialog, "RootDialog");
         }
 
+        // ==================== Tema ====================
         [RelayCommand]
         private void ToggleTheme()
         {
@@ -129,6 +124,7 @@ namespace library.ViewModels
             IsDarkTheme = ThemeService.IsDark;
         }
 
+        // ==================== Buscar ====================
         [RelayCommand]
         private void ClearSearch()
         {
@@ -141,6 +137,7 @@ namespace library.ViewModels
                 shell.GlobalSearch = string.Empty;
         }
 
+        // ==================== Perfil ====================
         [RelayCommand]
         private void ShowProfile()
         {
@@ -157,6 +154,7 @@ namespace library.ViewModels
                 MessageBoxImage.Information);
         }
 
+        // ==================== Logout ====================
         [RelayCommand]
         private void Logout()
         {

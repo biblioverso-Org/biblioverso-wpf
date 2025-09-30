@@ -7,8 +7,7 @@
              xmlns:views="clr-namespace:library.Controls"
              x:Name="root"
              HorizontalAlignment="Stretch"
-             Loaded="OnHeaderLoaded"
-             SizeChanged="OnHeaderSizeChanged">
+            >
 
   <!-- Reutiliza estilos (colores, botones, etc.) -->
   <UserControl.Resources>

@@ -1,19 +1,22 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.IconPacks;
+using Newtonsoft.Json.Linq;
 
-namespace library.Models;
-
-public sealed class DashStat
+namespace library.Models
 {
-    public string Title { get; }
-    public int Value { get; }
-    public int ThisMonth { get; }
-    public PackIconMaterialKind Icon { get; }
-
-    public DashStat(string title, int value, int thisMonth, PackIconMaterialKind icon)
+    public partial class DashStat : ObservableObject
     {
-        Title = title;
-        Value = value;
-        ThisMonth = thisMonth;
-        Icon = icon;
+        [ObservableProperty] private string title;
+        [ObservableProperty] private int value;
+        [ObservableProperty] private int delta; // crecimiento/variación
+        [ObservableProperty] private PackIconMaterialKind icon;
+
+        public DashStat(string title, int value, int delta, PackIconMaterialKind icon)
+        {
+            Title = title;
+            Value = value;
+            Delta = delta;
+            Icon = icon;
+        }
     }
 }

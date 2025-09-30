@@ -6,7 +6,7 @@ namespace library.Dialogs
 {
     public partial class LoanReservationDialogViewModel : ObservableObject
     {
-        public Reservation Reservation { get; }
+        public Reserva Reserva { get; }
 
         [ObservableProperty] private DateTime loanStart;
         [ObservableProperty] private DateTime dueDate;
@@ -15,13 +15,14 @@ namespace library.Dialogs
 
         public bool IsValid => DueDate.Date >= LoanStart.Date;
 
-        public LoanReservationDialogViewModel(Reservation r)
+        public LoanReservationDialogViewModel(Reserva r)
         {
-            Reservation = r;
-            LoanStart   = DateTime.Today;
-            // Sugerimos devolver en 7 días o mantenemos el dueDate mayor
-            var minDue  = LoanStart.AddDays(7).Date;
-            DueDate     = r.DueDate > minDue ? r.DueDate.Date : minDue;
+            Reserva = r;
+            LoanStart = DateTime.Today;
+
+            // Fecha mínima de devolución sugerida (7 días)
+            var minDue = LoanStart.AddDays(7).Date;
+            DueDate = minDue;
         }
     }
 }

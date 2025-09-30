@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="library.Controls.LoanTable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks">
+
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <DataGrid ItemsSource="{Binding LoansView}"
+                   Background="{DynamicResource App.CardBrush}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                   ColumnHeaderStyle="{StaticResource SlimHeader}"
+ RowStyle="{StaticResource SlimRow}"
+ CellStyle="{StaticResource CenterCell}"
+ HorizontalGridLinesBrush="{StaticResource RowSeparator}"
+                 
+                  RowHeaderWidth="0"
+                  IsReadOnly="True"
+                  materialDesign:DataGridAssist.CellPadding="12,8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12,10"
+                  VerticalAlignment="Stretch"
+                  HorizontalAlignment="Stretch">
+
+            <DataGrid.Columns>
+                <!-- Usuario con foto -->
+                <DataGridTemplateColumn Header="MIEMBRO" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="32" Height="32" Margin="0,0,8,0">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="{Binding Usuario.Foto}" Stretch="UniformToFill"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <TextBlock Text="{Binding Usuario.NombreCompleto}" 
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Libro con portada -->
+                <DataGridTemplateColumn Header="LIBRO" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Image Source="{Binding Libro.Portada}" Width="32" Height="48" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Libro.Titulo}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Fecha préstamo -->
+                <DataGridTextColumn Header="PRÉSTAMO" Binding="{Binding FechaPrestamo, StringFormat={}{0:dd/MM/yyyy}}" Width="*"/>
+
+                <!-- Fecha vencimiento -->
+                <DataGridTextColumn Header="VENCIMIENTO" Binding="{Binding FechaVencimiento, StringFormat={}{0:dd/MM/yyyy}}" Width="*"/>
+
+                <DataGridTemplateColumn Header="ESTADO" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border x:Name="chip"
+                    Padding="6,2" CornerRadius="10"
+                    BorderThickness="1" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Estado}" 
+                           FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+
+                            <!-- 👇 Los triggers deben ir aquí, dentro de DataTemplate -->
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Estado}" Value="activo">
+                                    <Setter TargetName="chip" Property="Background" Value="#DBEAFE"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#2563EB"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#1E3A8A"/>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Estado}" Value="devuelto">
+                                    <Setter TargetName="chip" Property="Background" Value="#D1FAE5"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#059669"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#064E3B"/>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Estado}" Value="vencido">
+                                    <Setter TargetName="chip" Property="Background" Value="#FEE2E2"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#DC2626"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#7F1D1D"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

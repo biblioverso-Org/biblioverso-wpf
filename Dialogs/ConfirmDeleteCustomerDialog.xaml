@@ -4,189 +4,158 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:library.Converters"
-             MinWidth="420" MaxWidth="560">
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             MinWidth="460" MaxWidth="600">
 
-  <!-- ===== Recursos (dinámicos / theme-aware) ===== -->
-  <UserControl.Resources>
-    <converters:InitialsConverter x:Key="Initials"/>
-    <converters:SafeImageSourceConverter x:Key="SafeImg"/>
+    <!-- ===== Recursos (Theme-aware) ===== -->
+    <UserControl.Resources>
+        <converters:InitialsConverter x:Key="Initials"/>
+        <converters:SafeImageSourceConverter x:Key="SafeImg"/>
 
-    <!-- Botones tipo píldora -->
-    <Style x:Key="PillButtonBase" TargetType="Button">
-      <Setter Property="Height" Value="36"/>
-      <Setter Property="MinWidth" Value="120"/>
-      <Setter Property="Padding" Value="12,0"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
-      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <!-- Usa tu hover global (del diccionario de tablas) -->
-                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PageHoverBg}"/>
-              </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.55"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
+        <!-- Botones tipo píldora (base) -->
+        <Style x:Key="PillButtonBase" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        </Style>
 
-    <Style x:Key="PillOutlineButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}"/>
+        <!-- Variantes -->
+        <Style x:Key="PillOutlineButton" TargetType="Button" BasedOn="{StaticResource PillButtonBase}"/>
+        <Style x:Key="PillDangerButton"  TargetType="Button" BasedOn="{StaticResource PillButtonBase}">
+            <Setter Property="Background"  Value="{DynamicResource App.ErrorBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource App.ErrorBrush}"/>
+            <Setter Property="Foreground"  Value="White"/>
+        </Style>
+    </UserControl.Resources>
 
-    <Style x:Key="PillDangerButton"  TargetType="Button" BasedOn="{StaticResource PillButtonBase}">
-      <Setter Property="Background"  Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.ErrorBrush}"/>
-      <Setter Property="Foreground"  Value="White"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
-              </Trigger>
-              <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-  </UserControl.Resources>
+    <!-- ===== Contenido ===== -->
+    <Border Padding="24,20,24,16"
+            Background="{DynamicResource App.CardBrush}"
+            BorderBrush="{DynamicResource App.BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="10">
 
-  <!-- ===== Contenido ===== -->
-  <Border Padding="24,20,24,16"
-          Background="{DynamicResource App.CardBrush}"
-          BorderBrush="{DynamicResource App.BorderBrush}"
-          BorderThickness="1"
-          CornerRadius="10">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>  <!-- Título -->
-        <RowDefinition Height="*"/>     <!-- Cuerpo -->
-        <RowDefinition Height="Auto"/>  <!-- Footer -->
-      </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="*"/>
+                <!-- Body -->
+                <RowDefinition Height="Auto"/>
+                <!-- Footer -->
+            </Grid.RowDefinitions>
 
-      <!-- Título -->
-      <StackPanel Grid.Row="0" Orientation="Horizontal">
-        <mah:PackIconMaterial Kind="TrashCanOutline" Width="20" Height="20"
-                              Foreground="{DynamicResource App.ErrorBrush}"/>
-        <TextBlock Text="Eliminar cliente"
-                   FontSize="20" FontWeight="SemiBold"
-                   Foreground="{DynamicResource App.TextPrimaryBrush}"
-                   Margin="8,0,0,0"/>
-      </StackPanel>
+            <!-- Header -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                <mah:PackIconMaterial Kind="TrashCanOutline"
+                                      Width="22" Height="22"
+                                      Foreground="{DynamicResource App.ErrorBrush}"
+                                      DockPanel.Dock="Left"/>
+                <TextBlock Text="Eliminar cliente"
+                           FontSize="20" FontWeight="SemiBold"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0"/>
+            </DockPanel>
 
-      <!-- Cliente + mensaje -->
-      <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,16,0,0">
-        <!-- Avatar -->
-        <Grid Width="64" Height="64" HorizontalAlignment="Center" Margin="0,0,12,0">
-          <!-- Fondo suave -->
-          <Ellipse Fill="{DynamicResource App.DividerBrush}" Opacity="0.35"/>
+            <!-- Body -->
+            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
+                <!-- Avatar -->
+                <Grid Width="72" Height="72" Margin="0,0,0,12">
+                    <Ellipse Fill="{DynamicResource App.DividerBrush}" Opacity="0.3"/>
 
-          <!-- Foto (visible si hay ruta válida) -->
-          <Ellipse>
-            <Ellipse.Style>
-              <Style TargetType="Ellipse">
-                <Setter Property="Visibility" Value="Visible"/>
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding PhotoPath}" Value="{x:Null}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                  </DataTrigger>
-                  <DataTrigger Binding="{Binding PhotoPath}" Value="">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </Ellipse.Style>
-            <Ellipse.Fill>
-              <ImageBrush Stretch="UniformToFill"
-                          ImageSource="{Binding PhotoPath, Converter={StaticResource SafeImg}}"/>
-            </Ellipse.Fill>
-          </Ellipse>
+                    <!-- Foto -->
+                    <Ellipse>
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Foto}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Foto}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="UniformToFill"
+                                        ImageSource="{Binding Foto, Converter={StaticResource SafeImg}}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
 
-          <!-- Iniciales cuando no hay foto -->
-          <Border CornerRadius="32"
-                  Background="{DynamicResource App.SurfaceBrush}"
-                  BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
-            <Border.Style>
-              <Style TargetType="Border">
-                <Setter Property="Visibility" Value="Collapsed"/>
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding PhotoPath}" Value="{x:Null}">
-                    <Setter Property="Visibility" Value="Visible"/>
-                  </DataTrigger>
-                  <DataTrigger Binding="{Binding PhotoPath}" Value="">
-                    <Setter Property="Visibility" Value="Visible"/>
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </Border.Style>
-            <TextBlock Text="{Binding FullName, Converter={StaticResource Initials}}"
-                       VerticalAlignment="Center" HorizontalAlignment="Center"
-                       FontWeight="SemiBold" FontSize="14"
-                       Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-          </Border>
+                    <!-- Iniciales -->
+                    <Border CornerRadius="36"
+                            Background="{DynamicResource App.SurfaceBrush}"
+                            BorderBrush="{DynamicResource App.BorderBrush}" BorderThickness="1">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Foto}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Foto}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding FullName, Converter={StaticResource Initials}}"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   FontWeight="Bold" FontSize="16"
+                                   Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+                    </Border>
+                </Grid>
+
+                <!-- Datos -->
+                <TextBlock Text="{Binding FullName}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"
+                           FontSize="16" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding Email}"
+                           Foreground="{DynamicResource App.TextSecondaryBrush}"
+                           HorizontalAlignment="Center"/>
+                
+
+                <!-- Mensaje -->
+                <TextBlock Text="¿Seguro que deseas eliminar este cliente? Esta acción no se puede deshacer."
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"
+                           Margin="0,8,0,0"/>
+            </StackPanel>
+
+            <!-- Footer -->
+            <DockPanel Grid.Row="2" LastChildFill="False" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Style="{StaticResource PillDangerButton}" DockPanel.Dock="Right"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                         CommandParameter="{x:Static sys:Boolean.TrueString}"
+
+                        >
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Eliminar"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource PillOutlineButton}" DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                         CommandParameter="{x:Static sys:Boolean.FalseString}"
+>
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
         </Grid>
-
-        <StackPanel>
-          <TextBlock Text="{Binding FullName}"
-                     HorizontalAlignment="Center"
-                     FontWeight="SemiBold"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,2,0,0">
-            <TextBlock Text="{Binding Email}" Foreground="{DynamicResource App.TextSecondaryBrush}" Margin="0,0,8,0"/>
-            <TextBlock Text="•" Foreground="{DynamicResource App.DividerBrush}" Margin="0,0,8,0"/>
-            <TextBlock Text="{Binding CI}" Foreground="{DynamicResource App.TextSecondaryBrush}"/>
-          </StackPanel>
-
-          <TextBlock Margin="0,10,0,0"
-                     TextWrapping="Wrap"
-                     Foreground="{DynamicResource App.TextPrimaryBrush}"
-                     Text="¿Seguro que deseas eliminar este cliente? Esta acción no se puede deshacer."/>
-        </StackPanel>
-      </StackPanel>
-
-      <!-- Botones -->
-      <DockPanel Grid.Row="2" LastChildFill="False" HorizontalAlignment="Center" Margin="0,16,0,0">
-        <Button Style="{StaticResource PillDangerButton}" DockPanel.Dock="Right"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="True">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Eliminar"/>
-          </StackPanel>
-        </Button>
-
-        <Button Style="{StaticResource PillOutlineButton}" DockPanel.Dock="Right" Margin="8,0,0,0"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="False">
-          <StackPanel Orientation="Horizontal">
-            <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
-            <TextBlock Text="Cancelar"/>
-          </StackPanel>
-        </Button>
-      </DockPanel>
-    </Grid>
-  </Border>
+    </Border>
 </UserControl>

@@ -1,36 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
+using HarfBuzzSharp;
 using library.Models;
-
-namespace library.Dialogs;
+using Microsoft.Win32;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public partial class EditCustomerDialogViewModel : ObservableObject
 {
-    [ObservableProperty] private string? photoPath;
-    [ObservableProperty] private string firstName = "";
-    [ObservableProperty] private string lastName  = "";
-    [ObservableProperty] private string ci        = "";
-    [ObservableProperty] private string email     = "";
-    [ObservableProperty] private string phone     = "";
-    [ObservableProperty] private string address   = "";
-    [ObservableProperty] private Gender gender    = Gender.Other;
+    [ObservableProperty] private string? foto;              // antes PhotoPath
+    [ObservableProperty] private string? nombre = "";
+    [ObservableProperty] private string? apellido = "";
 
-    public IReadOnlyList<Gender> Genders { get; } =
-        Enum.GetValues(typeof(Gender)).Cast<Gender>().ToList();
+    [ObservableProperty] private string? email = "";
+    [ObservableProperty] private string? telefono = "";
+    [ObservableProperty] private string? direccion = "";
+    [ObservableProperty] private string userName = "";      // antes Username
+    [ObservableProperty] private string password = "";
+    [ObservableProperty] private DateTime? fechaNacimiento;
+    [ObservableProperty] private string? nacionalidad = "";
+    [ObservableProperty] private string? biografia = "";
+    [ObservableProperty] private string? genero = "Otro";   // ahora string, no enum fijo
 
+    // Lista de géneros predefinidos
+    public IReadOnlyList<string> Genders { get; } = new List<string>
+    {
+        "Masculino", "Femenino", "Otro"
+    };
+
+    // Validación mínima
     public bool IsValid =>
-        !string.IsNullOrWhiteSpace(FirstName)
-        && !string.IsNullOrWhiteSpace(LastName)
+        !string.IsNullOrWhiteSpace(Nombre)
+        && !string.IsNullOrWhiteSpace(Apellido)
         && !string.IsNullOrWhiteSpace(Email);
 
-    partial void OnFirstNameChanged(string value) => OnPropertyChanged(nameof(IsValid));
-    partial void OnLastNameChanged(string value)  => OnPropertyChanged(nameof(IsValid));
-    partial void OnEmailChanged(string value)     => OnPropertyChanged(nameof(IsValid));
+    partial void OnNombreChanged(string? value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnApellidoChanged(string? value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnEmailChanged(string? value) => OnPropertyChanged(nameof(IsValid));
 
+    // Selección de imagen
     [RelayCommand]
     private void BrowseImage()
     {
@@ -40,18 +47,44 @@ public partial class EditCustomerDialogViewModel : ObservableObject
             Multiselect = false
         };
         if (dlg.ShowDialog() == true)
-            PhotoPath = dlg.FileName;
+            Foto = dlg.FileName;
     }
 
-    public static EditCustomerDialogViewModel FromCustomer(Customer c) => new()
+  
+
+
+    // Cargar datos desde Usuario
+    public static EditCustomerDialogViewModel FromUsuario(Usuario u) => new()
     {
-        PhotoPath = c.PhotoPath,
-        FirstName = c.FirstName,
-        LastName  = c.LastName,
-        Ci        = c.CI,          // ojo: Customer usa "CI"
-        Email     = c.Email,
-        Phone     = c.Phone,
-        Address   = c.Address,
-        Gender    = c.Gender
+        Foto = u.Foto,
+        Nombre = u.Nombre ?? "",
+        Apellido = u.Apellido ?? "",
+        Email = u.Email ?? "",
+        Telefono = u.Telefono ?? "",
+        Direccion = u.Direccion ?? "",
+        UserName = u.UserName,
+        Password = u.Password,
+        FechaNacimiento = u.FechaNacimiento,
+        Nacionalidad = u.Nacionalidad,
+        Biografia = u.Biografia,
+        Genero = string.IsNullOrWhiteSpace(u.Genero) ? "Otro" : u.Genero
     };
+
+    // Mapear de vuelta al modelo Usuario
+    public void UpdateUsuario(Usuario u)
+    {
+        u.Foto = Foto;
+        u.Nombre = Nombre;
+        u.Apellido = Apellido;
+        u.Email = Email;
+        u.Telefono = Telefono;
+        u.Direccion = Direccion;
+        u.UserName = UserName;
+        u.Password = Password;
+        u.FechaNacimiento = FechaNacimiento;
+        u.Nacionalidad = Nacionalidad;
+        u.Biografia = Biografia;
+        u.Genero = Genero;
+        u.FechaActualizacion = DateTime.Now;
+    }
 }

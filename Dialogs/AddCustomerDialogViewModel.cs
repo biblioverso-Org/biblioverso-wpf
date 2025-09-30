@@ -1,39 +1,51 @@
-// Dialogs/AddCustomerDialogViewModel.cs
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using HarfBuzzSharp;
+using library.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
-using library.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace library.Dialogs;
 
 public partial class AddCustomerDialogViewModel : ObservableObject
 {
-    [ObservableProperty] private string? photoPath;
-    [ObservableProperty] private string firstName = "";
-    [ObservableProperty] private string lastName  = "";
-    [ObservableProperty] private string ci        = "";
-    [ObservableProperty] private string email     = "";
-    [ObservableProperty] private string phone     = "";
-    [ObservableProperty] private string address   = "";
-    [ObservableProperty] private string username  = "";
-    [ObservableProperty] private string password  = "";
-    [ObservableProperty] private Gender gender    = Gender.Other;
+    [ObservableProperty] private string? foto;             // Foto de perfil
+    [ObservableProperty] private string userName = "";     // Usuario (requerido)
+    [ObservableProperty] private string password = "";     // Contraseña (requerido)
+    [ObservableProperty] private string? nombre = "";
+    [ObservableProperty] private string? apellido = "";
+    [ObservableProperty] private string? email = "";
+    [ObservableProperty] private string? telefono = "";
+    [ObservableProperty] private string? direccion = "";
+    [ObservableProperty] private string? genero = "";
+    [ObservableProperty] private DateTime? fechaNacimiento;
+    [ObservableProperty] private string? nacionalidad = "";
+    [ObservableProperty] private string? biografia = "";
 
-    public IReadOnlyList<Gender> Genders { get; } =
-        Enum.GetValues(typeof(Gender)).Cast<Gender>().ToList();
+    // Lista de géneros predefinidos (puedes extenderla desde DB si lo prefieres)
+    public IReadOnlyList<string> Genders { get; } = new List<string>
+    {
+        "Masculino", "Femenino", "Otro"
+    };
 
+    // Validación mínima
     public bool IsValid =>
-        !string.IsNullOrWhiteSpace(FirstName)
-        && !string.IsNullOrWhiteSpace(LastName)
+        !string.IsNullOrWhiteSpace(UserName)
+        && !string.IsNullOrWhiteSpace(Password)
+        && !string.IsNullOrWhiteSpace(Nombre)
+        && !string.IsNullOrWhiteSpace(Apellido)
         && !string.IsNullOrWhiteSpace(Email);
 
-    partial void OnFirstNameChanged(string value) => OnPropertyChanged(nameof(IsValid));
-    partial void OnLastNameChanged(string value)  => OnPropertyChanged(nameof(IsValid));
-    partial void OnEmailChanged(string value)     => OnPropertyChanged(nameof(IsValid));
+    partial void OnUserNameChanged(string value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnPasswordChanged(string value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnNombreChanged(string? value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnApellidoChanged(string? value) => OnPropertyChanged(nameof(IsValid));
+    partial void OnEmailChanged(string? value) => OnPropertyChanged(nameof(IsValid));
 
+    // Abrir selector de imágenes
     [RelayCommand]
     private void BrowseImage()
     {
@@ -43,6 +55,25 @@ public partial class AddCustomerDialogViewModel : ObservableObject
             Multiselect = false
         };
         if (dlg.ShowDialog() == true)
-            PhotoPath = dlg.FileName;
+            Foto = dlg.FileName;
     }
+
+    // Método auxiliar: mapear a modelo Usuario
+    public Usuario ToUsuario() => new Usuario
+    {
+        UserName = UserName,
+        Password = Password,
+        Nombre = Nombre,
+        Apellido = Apellido,
+        Email = Email,
+        Telefono = Telefono,
+        Direccion = Direccion,
+        Genero = Genero,
+        FechaNacimiento = FechaNacimiento,
+        Nacionalidad = Nacionalidad,
+        Biografia = Biografia,
+        Foto = Foto,
+        FechaCreacion = DateTime.Now,
+        FechaActualizacion = DateTime.Now
+    };
 }

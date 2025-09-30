@@ -5,49 +5,51 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:behaviors="clr-namespace:library.Behaviors">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
-      </ResourceDictionary.MergedDictionaries>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-      <!-- Chip de estado -->
-      <Style x:Key="StatusChip" TargetType="Border">
-        <Setter Property="Padding" Value="10,4"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Background" Value="#EEF2F6"/>
-        <Setter Property="BorderBrush" Value="#E2E8F0"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="TextElement.Foreground" Value="#475569"/>
-        <Style.Triggers>
-          <DataTrigger Binding="{Binding Status}" Value="Pending">
-            <Setter Property="Background" Value="#FFF7E6"/>
-            <Setter Property="BorderBrush" Value="#FFE8C7"/>
-            <Setter Property="TextElement.Foreground" Value="#B45309"/>
-          </DataTrigger>
-          <DataTrigger Binding="{Binding Status}" Value="Active">
-            <Setter Property="Background" Value="#E6F4FF"/>
-            <Setter Property="BorderBrush" Value="#CFE8FF"/>
-            <Setter Property="TextElement.Foreground" Value="#1D4ED8"/>
-          </DataTrigger>
-          <DataTrigger Binding="{Binding Status}" Value="Returned">
-            <Setter Property="Background" Value="#EAF7EF"/>
-            <Setter Property="BorderBrush" Value="#D2EFE0"/>
-            <Setter Property="TextElement.Foreground" Value="#047857"/>
-          </DataTrigger>
-          <DataTrigger Binding="{Binding Status}" Value="Overdue">
-            <Setter Property="Background" Value="#FEE2E2"/>
-            <Setter Property="BorderBrush" Value="#FECACA"/>
-            <Setter Property="TextElement.Foreground" Value="#B91C1C"/>
-          </DataTrigger>
-        </Style.Triggers>
-      </Style>
-    </ResourceDictionary>
-  </UserControl.Resources>
+            <!-- Chip de estado -->
+            <Style x:Key="StatusChip" TargetType="Border">
+                <Setter Property="Padding" Value="10,4"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Background" Value="#EEF2F6"/>
+                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="TextElement.Foreground" Value="#475569"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Estado}" Value="pendiente">
+                        <Setter Property="Background" Value="#FFF7E6"/>
+                        <Setter Property="BorderBrush" Value="#FFE8C7"/>
+                        <Setter Property="TextElement.Foreground" Value="#B45309"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Estado}" Value="notificado">
+                        <Setter Property="Background" Value="#E6F4FF"/>
+                        <Setter Property="BorderBrush" Value="#CFE8FF"/>
+                        <Setter Property="TextElement.Foreground" Value="#1D4ED8"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Estado}" Value="completada">
+                        <Setter Property="Background" Value="#EAF7EF"/>
+                        <Setter Property="BorderBrush" Value="#D2EFE0"/>
+                        <Setter Property="TextElement.Foreground" Value="#047857"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Estado}" Value="cancelada">
+                        <Setter Property="Background" Value="#FEE2E2"/>
+                        <Setter Property="BorderBrush" Value="#FECACA"/>
+                        <Setter Property="TextElement.Foreground" Value="#B91C1C"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <Grid>
-    <DataGrid x:Name="GridOrders"
+    <Grid>
+        <DataGrid x:Name="GridOrders"
               ItemsSource="{Binding OrdersView}"
+                  
+                   Background="{DynamicResource App.CardBrush}"
               AutoGenerateColumns="False"
               CanUserAddRows="False" CanUserReorderColumns="False"
               CanUserResizeColumns="False" CanUserDeleteRows="False"
@@ -64,83 +66,123 @@
               HorizontalAlignment="Stretch"
               ScrollViewer.VerticalScrollBarVisibility="Auto"
               behaviors:AdaptiveColumnsBehavior.Breakpoints="
-                    1200:Fine;
-                    1100:MemberName;
-                    1000:Code;
-                     900:BookTitle;
-                     820:StartDate">
+                    1200:FechaReserva;
+                    1000:Usuario.NombreCompleto;
+                     900:Libro.Titulo;
+                     820:Estado;">
 
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="CÓDIGO" SortMemberPath="Code"
-                            behaviors:AdaptiveColumnsBehavior.Key="Code"
-                            Binding="{Binding Code}" Width="*"
+            <DataGrid.Columns>
+
+
+                <DataGridTemplateColumn Header="MIEMBRO" Width="2*" SortMemberPath="Usuario.NombreCompleto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <!-- Avatar usuario -->
+                                <Ellipse Width="32" Height="32" Margin="0,0,8,0">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="{Binding Usuario.Foto}" Stretch="UniformToFill"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <TextBlock Text="{Binding Usuario.NombreCompleto}" VerticalAlignment="Center"
+                               FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Libro con portada -->
+                <DataGridTemplateColumn Header="LIBRO" Width="2*" SortMemberPath="Libro.Titulo">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Width="32" Height="48" Margin="0,0,8,0" CornerRadius="2" BorderThickness="1" BorderBrush="#DDD">
+                                    <Image Source="{Binding Libro.Portada}" Stretch="UniformToFill"/>
+                                </Border>
+                                <TextBlock Text="{Binding Libro.Titulo}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Fecha reserva -->
+                <DataGridTextColumn Header="FECHA RESERVA" SortMemberPath="FechaReserva"
+                            Binding="{Binding FechaReserva, StringFormat=\{0:dd/MM/yyyy\}}" Width="*"
                             ElementStyle="{StaticResource CellTextCenter}"/>
 
-        <DataGridTextColumn Header="MIEMBRO" SortMemberPath="MemberName"
-                            behaviors:AdaptiveColumnsBehavior.Key="MemberName"
-                            Binding="{Binding MemberName}" Width="2*"
-                            ElementStyle="{StaticResource CellTextCenter}"/>
+                <DataGridTemplateColumn Header="ESTADO" Width="*" SortMemberPath="Estado">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border x:Name="chip"
+                    Padding="8,2" CornerRadius="12"
+                    BorderThickness="1" Margin="0,0,4,0"
+                    HorizontalAlignment="Center"
+                    Background="#F3F4F6"   
+                                BorderBrush="#CBD5E1"
+                                
+                                >
+                                <TextBlock Text="{Binding Estado}" 
+                           FontSize="12" FontWeight="SemiBold"
+                           Foreground="#374151"/>
+                            </Border>
 
-        <DataGridTextColumn Header="LIBRO" SortMemberPath="BookTitle"
-                            behaviors:AdaptiveColumnsBehavior.Key="BookTitle"
-                            Binding="{Binding BookTitle}" Width="2*"
-                            ElementStyle="{StaticResource CellTextCenter}"/>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Estado}" Value="pendiente">
+                                    <Setter TargetName="chip" Property="Background" Value="#DBEAFE"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#2563EB"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#1E3A8A"/>
+                                </DataTrigger>
 
-        <DataGridTextColumn Header="FECHA RESERVA" SortMemberPath="StartDate"
-                            behaviors:AdaptiveColumnsBehavior.Key="StartDate"
-                            Binding="{Binding StartDate, StringFormat=\{0:dd/MM/yyyy\}}" Width="*"
-                            ElementStyle="{StaticResource CellTextCenter}"/>
+                                <DataTrigger Binding="{Binding Estado}" Value="notificado">
+                                    <Setter TargetName="chip" Property="Background" Value="#FCE7F3"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#DB2777"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#9D174D"/>
+                                </DataTrigger>
 
-        <DataGridTextColumn Header="FECHA LÍMITE" SortMemberPath="DueDate"
-                            behaviors:AdaptiveColumnsBehavior.Key="DueDate"
-                            Binding="{Binding DueDate, StringFormat=\{0:dd/MM/yyyy\}}" Width="*"
-                            ElementStyle="{StaticResource CellTextCenter}"/>
+                                <!-- corregido: cancelada -->
+                                <DataTrigger Binding="{Binding Estado}" Value="cancelada">
+                                    <Setter TargetName="chip" Property="Background" Value="#FEE2E2"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#DC2626"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#7F1D1D"/>
+                                </DataTrigger>
 
-        <DataGridTemplateColumn Header="ESTADO" SortMemberPath="Status" Width="*"
-                                behaviors:AdaptiveColumnsBehavior.Key="Status">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <Border Style="{StaticResource StatusChip}" HorizontalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                  <Ellipse Width="8" Height="8" Fill="#64748B" Margin="0,0,6,0"/>
-                  <TextBlock Text="{Binding Status}" FontWeight="SemiBold"/>
-                </StackPanel>
-              </Border>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
+                                <!-- corregido: completada -->
+                                <DataTrigger Binding="{Binding Estado}" Value="completada">
+                                    <Setter TargetName="chip" Property="Background" Value="#D1FAE5"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#059669"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#064E3B"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-        <DataGridTextColumn Header="MULTA" SortMemberPath="Fine"
-                            behaviors:AdaptiveColumnsBehavior.Key="Fine"
-                            Binding="{Binding Fine, StringFormat=\{0:C\}}" Width="*"
-                            ElementStyle="{StaticResource CellTextCenter}"/>
-
-        <!-- ACCIONES: Realizar préstamo / Cancelar reserva -->
-        <DataGridTemplateColumn Header="ACCIÓN" Width="180" CanUserSort="False"
-                                behaviors:AdaptiveColumnsBehavior.Key="Action">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                <!-- Realizar préstamo -->
-                <Button Style="{StaticResource GhostIconButton}"
+                <!-- ACCIONES -->
+                <DataGridTemplateColumn Header="ACCIÓN" Width="180" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                                <!-- Realizar préstamo -->
+                                <Button Style="{StaticResource GhostIconButton}"
                         ToolTip="Realizar préstamo"
                         Command="{Binding DataContext.StartLoanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         CommandParameter="{Binding}">
-                  <mah:PackIconMaterial Kind="BookCheckOutline" Width="18" Height="18" Foreground="#6B7280"/>
-                </Button>
+                                    <mah:PackIconMaterial Kind="BookCheckOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
 
-                <!-- Cancelar reserva -->
-                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                                <!-- Cancelar reserva -->
+                                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
                         ToolTip="Cancelar reserva"
                         Command="{Binding DataContext.CancelReservationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         CommandParameter="{Binding}">
-                  <mah:PackIconMaterial Kind="CloseCircleOutline" Width="18" Height="18" Foreground="#6B7280"/>
-                </Button>
-              </StackPanel>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-      </DataGrid.Columns>
-    </DataGrid>
-  </Grid>
+                                    <mah:PackIconMaterial Kind="CloseCircleOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
 </UserControl>
