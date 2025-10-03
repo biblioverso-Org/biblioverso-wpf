@@ -1,10 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HarfBuzzSharp;
 using library.Models;
 using Microsoft.Win32;
 using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace library.Dialogs;
 
@@ -14,7 +12,7 @@ public partial class EditProfileDialogViewModel : ObservableObject
     [ObservableProperty] private string? nombre;
     [ObservableProperty] private string? apellido;
     [ObservableProperty] private string? email;
-    [ObservableProperty] private string? userName;
+    [ObservableProperty] private string? usuario;
     [ObservableProperty] private string? telefono;
     [ObservableProperty] private string? direccion;
     [ObservableProperty] private string? biografia;
@@ -32,13 +30,12 @@ public partial class EditProfileDialogViewModel : ObservableObject
         !string.IsNullOrWhiteSpace(Nombre) &&
         !string.IsNullOrWhiteSpace(Apellido) &&
         !string.IsNullOrWhiteSpace(Email) &&
-        !string.IsNullOrWhiteSpace(UserName);
+        !string.IsNullOrWhiteSpace(Usuario);
 
-    // Actualizar validaciones
     partial void OnNombreChanged(string? _) { OnPropertyChanged(nameof(IsValid)); OnPropertyChanged(nameof(NombreCompleto)); }
     partial void OnApellidoChanged(string? _) { OnPropertyChanged(nameof(IsValid)); OnPropertyChanged(nameof(NombreCompleto)); }
     partial void OnEmailChanged(string? _) => OnPropertyChanged(nameof(IsValid));
-    partial void OnUserNameChanged(string? _) => OnPropertyChanged(nameof(IsValid));
+    partial void OnUsuarioChanged(string? _) => OnPropertyChanged(nameof(IsValid));
 
     [RelayCommand]
     private void BrowseImage()
@@ -63,7 +60,7 @@ public partial class EditProfileDialogViewModel : ObservableObject
         Nombre = u.Nombre,
         Apellido = u.Apellido,
         Email = u.Email,
-        UserName = u.UserName,
+        Usuario = u.UserName,
         Telefono = u.Telefono,
         Direccion = u.Direccion,
         Biografia = u.Biografia,
@@ -75,7 +72,7 @@ public partial class EditProfileDialogViewModel : ObservableObject
         u.Nombre = Nombre;
         u.Apellido = Apellido;
         u.Email = Email;
-        u.UserName = UserName;
+        u.UserName = Usuario;
         u.Telefono = Telefono;
         u.Direccion = Direccion;
         u.Biografia = Biografia;

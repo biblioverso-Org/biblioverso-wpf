@@ -63,6 +63,7 @@ namespace library.ViewModels
         }
 
         // ==================== Editar perfil ====================
+
         private async Task OpenEditProfileAsync(Usuario? usuario)
         {
             if (CurrentUser == null)
@@ -73,16 +74,7 @@ namespace library.ViewModels
 
             var target = usuario ?? CurrentUser;
 
-            var vm = new EditProfileDialogViewModel
-            {
-                Nombre = target.Nombre ?? "",
-                Apellido = target.Apellido ?? "",
-                Email = target.Email ?? "",
-                Telefono = target.Telefono ?? "",
-                Direccion = target.Direccion ?? "",
-                Foto = target.Foto
-            };
-
+            var vm = EditProfileDialogViewModel.FromUsuario(target);
             var view = new EditProfileDialog { DataContext = vm };
 
             try
@@ -91,12 +83,33 @@ namespace library.ViewModels
 
                 if (result is EditProfileDialogViewModel saved)
                 {
-                    MessageBox.Show($"Perfil actualizado: {saved.Nombre} {saved.Apellido}\n\n" +
-                                    $"ID Usuario: {CurrentUser.IdUsuario}\n" +
-                                    $"Rol: {CurrentUser.RolDisplay}");
+                    // Inicializar servicio de Cloudinary
+                    var cloudService = new CloudinaryService(
+                        "dvw5h3ccw",   // 👈 tu cloud name
+                        "893598289963378",  // 👈 tu API Key
+                        "mKNQQGTlypYx947y0F72jpnzb88" // 👈 tu API Secret
+                    );
 
-                    // TODO: Aquí deberías actualizar el usuario en la base de datos
-                    // usando IUserService.UpdateUsuarioAsync(saved)
+                    string? fotoUrl = target.Foto;
+
+                    // 🔹 Si el usuario seleccionó una nueva foto
+                    if (!string.IsNullOrEmpty(saved.Foto))
+                    {
+                        fotoUrl = await cloudService.UploadImageAsync(saved.Foto);
+                    }
+
+                    // Aplicar cambios al objeto en memoria
+                    saved.ApplyToUsuario(CurrentUser);
+                    CurrentUser.Foto = fotoUrl;
+
+                    // 🔹 Guardar en la BD
+                    var userService = new UsuarioService();
+                    await userService.UpdateUsuarioAsync(CurrentUser);
+
+                    MessageBox.Show(
+                        $"✅ Perfil actualizado:\n{CurrentUser.Nombre} {CurrentUser.Apellido}\n📧 {CurrentUser.Email}",
+                        "Perfil actualizado", MessageBoxButton.OK, MessageBoxImage.Information
+                    );
                 }
             }
             catch (Exception ex)
@@ -104,9 +117,8 @@ namespace library.ViewModels
                 MessageBox.Show($"🔥 Error en DialogHost.Show: {ex.Message}");
             }
         }
-
         // ==================== Notificaciones ====================
-      
+
         public async Task CargarNotificacionesCountAsync(int userId)
         {
             var notifs = await _notificacionService.ObtenerNotificacionesAsync(userId, 50);

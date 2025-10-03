@@ -240,10 +240,9 @@
 
           <Ellipse Width="30" Height="30"  Margin="5 0 0 0">
             <Ellipse.Fill>
-              <!-- Si luego tienes CurrentUser.AvatarUri, puedes enlazar aquí.
-                   Por ahora dejamos la imagen estática existente -->
-              <StaticResource ResourceKey="AvatarBrush"/>
-            </Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding CurrentUser.Foto}"
+                        Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
           </Ellipse>
 
           <StackPanel Grid.Column="1" Margin="8,0,0,0"

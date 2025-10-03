@@ -17,6 +17,37 @@ namespace library.Services
             _conexion = new Conexion();
         }
 
+        public async Task UpdateUsuarioAsync(Usuario usuario)
+        {
+            var query = @"
+                UPDATE usuario SET
+                    nombre = @nombre,
+                    apellido = @apellido,
+                    email = @correo,
+                    telefono = @telefono,
+                    direccion = @direccion,
+                    usuario = @username,
+                    biografia = @bio,
+                    foto = @foto,
+                    fecha_actualizacion = NOW()
+                WHERE id_usuario = @id";
+
+            var param = new[]
+            {
+                new NpgsqlParameter("@nombre", usuario.Nombre ?? (object)DBNull.Value),
+                new NpgsqlParameter("@apellido", usuario.Apellido ?? (object)DBNull.Value),
+                new NpgsqlParameter("@correo", usuario.Email ?? (object)DBNull.Value),
+                new NpgsqlParameter("@telefono", usuario.Telefono ?? (object)DBNull.Value),
+                new NpgsqlParameter("@direccion", usuario.Direccion ?? (object)DBNull.Value),
+                new NpgsqlParameter("@username", usuario.UserName ?? (object)DBNull.Value),
+                new NpgsqlParameter("@bio", usuario.Biografia ?? (object)DBNull.Value),
+                new NpgsqlParameter("@foto", usuario.Foto ?? (object)DBNull.Value),
+                new NpgsqlParameter("@id", usuario.IdUsuario),
+            };
+
+            await _conexion.ExecuteNonQueryAsync(query, param);
+        }
+
         public async Task<List<Usuario>> GetClientesAsync()
         {
             var clientes = new List<Usuario>();
