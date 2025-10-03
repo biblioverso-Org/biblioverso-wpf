@@ -53,6 +53,8 @@
         <DataTemplate DataType="{x:Type vm:HistorialViewModel}">
             <historial:HistorialView />
         </DataTemplate>
+      
+
 
     </Window.Resources>
 

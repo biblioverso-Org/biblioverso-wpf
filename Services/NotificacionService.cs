@@ -11,9 +11,6 @@ namespace library.Services
     {
         private readonly Conexion _conexion = new Conexion();
 
-        /// <summary>
-        /// Crear una nueva notificación
-        /// </summary>
         public async Task<long> CrearNotificacionAsync(int idUsuario, string titulo, string mensaje)
         {
             var query = @"INSERT INTO notificacion (id_usuario, titulo, mensaje, fecha, leida)
@@ -30,15 +27,14 @@ namespace library.Services
             return (long)(await _conexion.ExecuteScalarAsync(query, param))!;
         }
 
-        /// <summary>
-        /// Obtener las últimas notificaciones de un usuario
-        /// </summary>
         public async Task<List<Notificacion>> ObtenerNotificacionesAsync(int idUsuario, int limit = 20)
         {
-            var query = @"SELECT id_notificacion, id_usuario, titulo, mensaje, leida, fecha
-                          FROM notificacion
-                          WHERE id_usuario=@usuario
-                          ORDER BY fecha DESC
+            var query = @"SELECT n.id_notificacion, n.id_usuario, n.titulo, n.mensaje, n.leida, n.fecha,
+                                 u.nombre, u.apellido
+                          FROM notificacion n
+                          JOIN usuario u ON n.id_usuario = u.id_usuario
+                          WHERE n.id_usuario=@usuario
+                          ORDER BY n.fecha DESC
                           LIMIT @limite";
 
             var param = new[]
@@ -52,7 +48,7 @@ namespace library.Services
 
             while (await reader.ReadAsync())
             {
-                lista.Add(new Notificacion
+                var notif = new Notificacion
                 {
                     IdNotificacion = reader.GetInt64(0),
                     IdUsuario = reader.GetInt32(1),
@@ -60,15 +56,25 @@ namespace library.Services
                     Mensaje = reader.GetString(3),
                     Leida = reader.GetBoolean(4),
                     Fecha = reader.GetDateTime(5)
-                });
+                };
+
+                // Generar iniciales a partir de nombre/apellido
+                var nombre = reader.IsDBNull(6) ? "" : reader.GetString(6);
+                var apellido = reader.IsDBNull(7) ? "" : reader.GetString(7);
+
+                if (!string.IsNullOrEmpty(nombre) && !string.IsNullOrEmpty(apellido))
+                    notif.Iniciales = $"{nombre[0]}{apellido[0]}".ToUpper();
+                else if (!string.IsNullOrEmpty(nombre))
+                    notif.Iniciales = nombre.Substring(0, 1).ToUpper();
+                else
+                    notif.Iniciales = "??";
+
+                lista.Add(notif);
             }
 
             return lista;
         }
 
-        /// <summary>
-        /// Marcar una notificación como leída
-        /// </summary>
         public async Task MarcarLeidaAsync(long idNotificacion)
         {
             var query = @"UPDATE notificacion SET leida=TRUE WHERE id_notificacion=@id";
@@ -76,14 +82,11 @@ namespace library.Services
             await _conexion.ExecuteNonQueryAsync(query, param);
         }
 
-        /// <summary>
-        /// Marcar todas las notificaciones de un usuario como leídas
-        /// </summary>
-        public async Task MarcarTodasLeidasAsync(int idUsuario)
+        public async Task<int> ContarNoLeidasAsync(int idUsuario)
         {
-            var query = @"UPDATE notificacion SET leida=TRUE WHERE id_usuario=@usuario";
+            var query = @"SELECT COUNT(*) FROM notificacion WHERE id_usuario=@usuario AND leida=FALSE";
             var param = new[] { new NpgsqlParameter("@usuario", idUsuario) };
-            await _conexion.ExecuteNonQueryAsync(query, param);
+            return Convert.ToInt32(await _conexion.ExecuteScalarAsync(query, param));
         }
     }
 }

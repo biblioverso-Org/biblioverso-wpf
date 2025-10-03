@@ -1,7 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using library.Models;
 using library.Services;
 
@@ -12,31 +15,40 @@ namespace library.ViewModels
         private readonly NotificacionService _notificacionService = new();
 
         [ObservableProperty]
-        private ObservableCollection<Notificacion> todayNotifications = new();
+        private ObservableCollection<Notificacion> notificaciones = new();
 
-        [ObservableProperty]
-        private ObservableCollection<Notificacion> weekNotifications = new();
-
-        // ⚠️ Ajusta al id_usuario real del administrador
-        private readonly int _adminId = 1;
-
-        public async Task CargarNotificacionesAsync()
+        /// <summary>
+        /// Cargar notificaciones de un usuario
+        /// </summary>
+        public async Task CargarNotificacionesAsync(int idUsuario)
         {
-            var notifs = await _notificacionService.ObtenerNotificacionesAsync(_adminId, 50);
+            var notifs = await _notificacionService.ObtenerNotificacionesAsync(idUsuario, 50);
 
-            var hoy = DateTime.Today;
-            var inicioSemana = hoy.AddDays(-(int)hoy.DayOfWeek); // lunes
+            Notificaciones.Clear();
+            foreach (var n in notifs.Where(n => !n.Leida)) // 🔹 solo mostrar no leídas
+                Notificaciones.Add(n);
+        }
 
-            TodayNotifications.Clear();
-            WeekNotifications.Clear();
+        /// <summary>
+        /// Marcar una notificación como leída y actualizar UI
+        /// </summary>
+        [RelayCommand]
+        private async Task MarcarLeido(Notificacion notif)
+        {
+            if (notif == null) return;
 
-            foreach (var n in notifs)
-            {
-                if (n.Fecha.Date == hoy)
-                    TodayNotifications.Add(n);
-                else if (n.Fecha.Date >= inicioSemana)
-                    WeekNotifications.Add(n);
-            }
+            await _notificacionService.MarcarLeidaAsync(notif.IdNotificacion);
+
+            // Eliminar de la lista al instante
+            Notificaciones.Remove(notif);
+
+            // 🔄 Actualizar contador en TopBar
+            var shell = Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w.IsActive)?
+                .DataContext as ShellViewModel;
+
+            shell?.TopBar?.UpdateNotificationCount();
         }
     }
 }

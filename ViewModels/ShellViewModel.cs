@@ -76,7 +76,7 @@ public partial class ShellViewModel : ObservableObject
 
         SetupNavigation();
         UpdateAuthenticationState();
-       
+
     }
 
     private void SetupNavigation()
@@ -101,6 +101,8 @@ public partial class ShellViewModel : ObservableObject
     targetVm: Authors));
         NavItems.Add(new NavigationItem("Historial", PackIconMaterialKind.History, NavSection.Primary,
     targetVm: Historial));
+      
+
 
     }
 
@@ -113,7 +115,7 @@ public partial class ShellViewModel : ObservableObject
     private void OnUserLoggedIn(Usuario usuario)
     {
         UpdateAuthenticationState();
-        
+
         NavigateToDashboard();
     }
 
@@ -227,6 +229,9 @@ public partial class ShellViewModel : ObservableObject
         if (!IsLoggedIn) return;
         CurrentViewModel = Books;
     }
+
+   
+
 
     public void NavigateToCategories()
     {

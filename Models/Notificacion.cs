@@ -1,4 +1,6 @@
-﻿namespace library.Models
+﻿using System;
+
+namespace library.Models
 {
     public class Notificacion
     {
@@ -9,14 +11,11 @@
         public DateTime Fecha { get; set; }
         public bool Leida { get; set; }
 
-        // Para UI
-        public string DisplayTitle => Titulo;
-        public string DisplayMessage => Mensaje;
+        // Iniciales calculadas si no hay foto
+        public string Iniciales { get; set; } = "??";
 
         public string TimeAgo => (DateTime.Now - Fecha).TotalMinutes < 60
             ? $"{(int)(DateTime.Now - Fecha).TotalMinutes} min ago"
             : Fecha.ToString("g");
-
-        public string Avatar => "Assets/default-avatar.png"; // 🔹 si no tienes avatar real
     }
 }

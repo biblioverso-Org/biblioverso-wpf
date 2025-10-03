@@ -18,6 +18,7 @@ namespace library.ViewModels
         [ObservableProperty] private string? searchText;
         [ObservableProperty] private int notificationsCount = 4;
         [ObservableProperty] private bool isDarkTheme;
+        private readonly NotificacionService _notificacionService = new();
 
         // Propiedades del usuario actual
         [ObservableProperty] private string userName = "Usuario";
@@ -53,13 +54,12 @@ namespace library.ViewModels
             UserRole = usuario.RolDisplay;
             IsAdmin = usuario.EsAdministrador;
 
-            // Generar iniciales
             var names = usuario.DisplayName.Split(' ');
             UserInitials = names.Length >= 2
                 ? $"{names[0][0]}{names[1][0]}".ToUpper()
-                : usuario.DisplayName.Length > 0
-                    ? usuario.DisplayName.Substring(0, Math.Min(2, usuario.DisplayName.Length)).ToUpper()
-                    : "U";
+                : usuario.DisplayName.Substring(0, Math.Min(2, usuario.DisplayName.Length)).ToUpper();
+
+            _ = CargarNotificacionesCountAsync(usuario.IdUsuario); // 🔹 aquí
         }
 
         // ==================== Editar perfil ====================
@@ -106,14 +106,11 @@ namespace library.ViewModels
         }
 
         // ==================== Notificaciones ====================
-        [RelayCommand]
-        private async Task OpenNotifications()
+      
+        public async Task CargarNotificacionesCountAsync(int userId)
         {
-            var vm = new NotificationsViewModel();
-            await vm.CargarNotificacionesAsync();
-
-            var dialog = new NotificationsDialog { DataContext = vm };
-            await DialogHost.Show(dialog, "RootDialog");
+            var notifs = await _notificacionService.ObtenerNotificacionesAsync(userId, 50);
+            NotificationsCount = notifs.Count(n => !n.Leida);
         }
 
         // ==================== Tema ====================
@@ -175,5 +172,27 @@ namespace library.ViewModels
         {
             // TODO: cambiar idioma
         }
+
+        [RelayCommand]
+        private async Task OpenNotifications()
+        {
+            var vm = new NotificationsViewModel();
+            if (CurrentUser != null)
+                await vm.CargarNotificacionesAsync(CurrentUser.IdUsuario);
+
+            var dialog = new NotificationsDialog { DataContext = vm };
+            await DialogHost.Show(dialog, "RootDialog");
+
+            UpdateNotificationCount();
+        }
+
+        public async void UpdateNotificationCount()
+        {
+            if (CurrentUser == null) return;
+            var service = new NotificacionService();
+            NotificationsCount = await service.ContarNoLeidasAsync(CurrentUser.IdUsuario);
+        }
+
+
     }
 }
