@@ -48,6 +48,7 @@ namespace library
                     services.AddTransient<LoanViewModel>();
                     services.AddTransient<CategoriesViewModel>();
                     services.AddTransient<AuthorsViewModel>();
+                    services.AddTransient<HistorialViewModel>();
 
 
                     // Registrar ventanas

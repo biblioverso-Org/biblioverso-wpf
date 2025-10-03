@@ -35,6 +35,7 @@ public partial class ShellViewModel : ObservableObject
     public LoanViewModel Loans { get; private set; }
     public CategoriesViewModel Categories { get; private set; }
     public AuthorsViewModel Authors { get; private set; }
+    public HistorialViewModel Historial { get; private set; }
 
 
 
@@ -51,7 +52,8 @@ public partial class ShellViewModel : ObservableObject
         OrdersViewModel orders,
         TopBarViewModel topBar,
         CategoriesViewModel categories,
-        AuthorsViewModel authors)
+        AuthorsViewModel authors,
+        HistorialViewModel historial)
     {
         _userSessionService = userSessionService;
         LoginViewModel = loginViewModel;
@@ -64,6 +66,7 @@ public partial class ShellViewModel : ObservableObject
         TopBar = topBar;
         Categories = categories;
         Authors = authors;
+        Historial = historial;
         // Suscribirse a eventos del servicio de sesión
         _userSessionService.UserLoggedIn += OnUserLoggedIn;
         _userSessionService.UserLoggedOut += OnUserLoggedOut;
@@ -73,7 +76,7 @@ public partial class ShellViewModel : ObservableObject
 
         SetupNavigation();
         UpdateAuthenticationState();
-        
+       
     }
 
     private void SetupNavigation()
@@ -96,6 +99,8 @@ public partial class ShellViewModel : ObservableObject
     targetVm: Categories));
         NavItems.Add(new NavigationItem("Autores", PackIconMaterialKind.AccountTieOutline, NavSection.Primary,
     targetVm: Authors));
+        NavItems.Add(new NavigationItem("Historial", PackIconMaterialKind.History, NavSection.Primary,
+    targetVm: Historial));
 
     }
 
@@ -202,6 +207,12 @@ public partial class ShellViewModel : ObservableObject
     {
         if (!IsLoggedIn) return;
         CurrentViewModel = Authors;
+    }
+
+    public void NavigateToHistorial()   // ✅ NUEVO
+    {
+        if (!IsLoggedIn) return;
+        CurrentViewModel = Historial;
     }
 
 

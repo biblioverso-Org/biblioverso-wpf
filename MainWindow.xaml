@@ -10,9 +10,10 @@
         xmlns:orders="clr-namespace:library.Views.Orders"
         xmlns:loans="clr-namespace:library.Views.Loan"
         xmlns:auth="clr-namespace:library.Views.Auth"
+        xmlns:historial="clr-namespace:library.Views.Historial"
         xmlns:converters="clr-namespace:library.Converters" 
         xmlns:categories="clr-namespace:library.Views.Categories"
-        xmlns:authors="clr-namespace:library.Views.Authors"
+        xmlns:authors="clr-namespace:library.Views.Authors" 
         Background="{DynamicResource App.BackgroundBrush}"
         Foreground="{DynamicResource App.TextPrimaryBrush}"
         MinWidth="800"
@@ -48,6 +49,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:AuthorsViewModel}">
             <authors:AuthorsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HistorialViewModel}">
+            <historial:HistorialView />
         </DataTemplate>
 
     </Window.Resources>

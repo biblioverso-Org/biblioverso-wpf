@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="library.Views.Historial.HistorialView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Themes/CustomersTable.Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Margin="2 0 8 2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Card contenedora -->
+        <materialDesign:Card Grid.Row="0"
+                             Grid.RowSpan="3"
+                             Margin="2 0 4 8"
+                             Background="{DynamicResource Brush.Card}"
+                             BorderBrush="{DynamicResource Brush.Border}"
+                             BorderThickness="1"
+                             UniformCornerRadius="10">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Encabezado -->
+                    <RowDefinition Height="8"/>
+                    <!-- Espaciador -->
+                    <RowDefinition Height="*"/>
+                    <!-- Tabla -->
+                </Grid.RowDefinitions>
+
+                <!-- ENCABEZADO con filtros alineados -->
+                <Grid Grid.Row="0" Margin="12,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <!-- Título -->
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- Filtros -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Título a la izquierda -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Historial de Actividades"
+                                   FontWeight="SemiBold"
+                                   FontSize="16"
+                                   Foreground="{StaticResource TitleFg}"
+                                   Margin="0,0,6,0"/>
+                        <mah:PackIconMaterial Kind="ArrowTopRight"
+                                              Width="14" Height="14"
+                                              VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Filtros a la derecha -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBox Width="150"
+                                 Text="{Binding FiltroUsuario, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="Usuario"
+                                 Margin="0,0,8,0"/>
+
+                        <TextBox Width="150"
+                                 Text="{Binding FiltroRol, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="Rol"
+                                 Margin="0,0,8,0"/>
+
+                        <DatePicker Width="150" SelectedDate="{Binding FiltroDesde}" Margin="0,0,8,0"/>
+                        <DatePicker Width="150" SelectedDate="{Binding FiltroHasta}" Margin="0,0,8,0"/>
+
+                        <Button Content="Filtrar"
+                                Command="{Binding FilterCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- TABLA -->
+                <DataGrid Grid.Row="2"
+                          ItemsSource="{Binding Actividades}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          ColumnHeaderStyle="{StaticResource SlimHeader}"
+                          CellStyle="{StaticResource CenterCell}"
+                          HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
+                          Background="{DynamicResource App.CardBrush}"
+                          HeadersVisibility="Column"
+                          EnableRowVirtualization="True">
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource SlimRow}" />
+                    </DataGrid.RowStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding IdActividad}" Width="60"/>
+                        <DataGridTextColumn Header="Usuario" Binding="{Binding Usuario}" Width="*"/>
+                        <DataGridTextColumn Header="Rol" Binding="{Binding Rol}" Width="100"/>
+                        <DataGridTextColumn Header="Acción" Binding="{Binding Accion}" Width="2*"/>
+                        <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=g}" Width="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>
