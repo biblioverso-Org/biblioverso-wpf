@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="library.Dialogs.CustomerHistoryDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             MinWidth="600" MaxWidth="760">
+
+    <Border Padding="24,20,24,16"
+          Background="{DynamicResource App.CardBrush}"
+          BorderBrush="{DynamicResource App.BorderBrush}"
+          BorderThickness="1" CornerRadius="10">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Historial de préstamos"
+                 FontSize="20" FontWeight="SemiBold" Margin="4,0,4,16"
+                 Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+
+            <!-- Tabla -->
+            <DataGrid Grid.Row="1" 
+                      ItemsSource="{Binding Historial}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      HeadersVisibility="Column">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Fecha préstamo" Binding="{Binding FechaPrestamo}"/>
+                    <DataGridTextColumn Header="Fecha devolución" Binding="{Binding FechaDevolucion}"/>
+                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Footer -->
+            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,12,0,0">
+                <Button  DockPanel.Dock="Right"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cerrar"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Grid>
+    </Border>
+</UserControl>

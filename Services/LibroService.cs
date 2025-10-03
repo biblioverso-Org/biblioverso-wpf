@@ -417,5 +417,31 @@ namespace library.Services
 
             return result;
         }
+
+
+        public async Task<int> AddCategoriaAsync(Categoria c)
+        {
+            var query = "INSERT INTO categoria(nombre) VALUES(@nombre)";
+            return await _conexion.ExecuteNonQueryAsync(query, new[] {
+                new NpgsqlParameter("@nombre", c.Nombre)
+            });
+        }
+
+        public async Task<int> UpdateCategoriaAsync(Categoria c)
+        {
+            var query = "UPDATE categoria SET nombre=@nombre WHERE id_categoria=@id";
+            return await _conexion.ExecuteNonQueryAsync(query, new[] {
+                new NpgsqlParameter("@nombre", c.Nombre),
+                new NpgsqlParameter("@id", c.IdCategoria)
+            });
+        }
+
+        public async Task<int> DeleteCategoriaAsync(int id)
+        {
+            var query = "DELETE FROM categoria WHERE id_categoria=@id";
+            return await _conexion.ExecuteNonQueryAsync(query, new[] {
+                new NpgsqlParameter("@id", id)
+            });
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace library.ViewModels
         public IAsyncRelayCommand AddCustomerAsyncCommand { get; }
         public IAsyncRelayCommand<Usuario?> EditCustomerCommand { get; }
         public IAsyncRelayCommand<Usuario?> DeleteCustomerCommand { get; }
+        public IAsyncRelayCommand<Usuario?> ViewHistoryCommand { get; }
+        public IAsyncRelayCommand<Usuario?> ViewInfoCommand { get; }
 
         public ObservableCollection<Usuario> Customers { get; }
         public ICollectionView CustomersView { get; }
@@ -37,6 +39,8 @@ namespace library.ViewModels
             AddCustomerAsyncCommand = new AsyncRelayCommand(AddCustomerAsync);
             EditCustomerCommand = new AsyncRelayCommand<Usuario?>(EditCustomerAsync);
             DeleteCustomerCommand = new AsyncRelayCommand<Usuario?>(DeleteCustomerAsync);
+            ViewHistoryCommand = new AsyncRelayCommand<Usuario?>(ViewHistoryAsync);
+            ViewInfoCommand = new AsyncRelayCommand<Usuario?>(ViewInfoAsync);
 
             CustomersView = CollectionViewSource.GetDefaultView(Customers);
             CustomersView.Filter = FilterCustomer;
@@ -192,5 +196,26 @@ namespace library.ViewModels
             Stats.Add(new DashStat("Usuarios Nuevos", nuevos, deltaNuevos, PackIconMaterialKind.AccountPlus));
             Stats.Add(new DashStat("Usuarios Activos", activos, deltaActivos, PackIconMaterialKind.AccountCheck));
         }
+
+        // ===================== Ver historial =====================
+        private async Task ViewHistoryAsync(Usuario? c)
+        {
+            if (c is null) return;
+
+            var vm = new CustomerHistoryDialogViewModel(c, _service);
+            var view = new CustomerHistoryDialog { DataContext = vm };
+            await DialogHost.Show(view, "RootDialog");
+        }
+
+        // ===================== Ver información general =====================
+        private async Task ViewInfoAsync(Usuario? c)
+        {
+            if (c is null) return;
+
+            var vm = new CustomerInfoDialogViewModel(c);
+            var view = new CustomerInfoDialog { DataContext = vm };
+            await DialogHost.Show(view, "RootDialog");
+        }
+
     }
 }

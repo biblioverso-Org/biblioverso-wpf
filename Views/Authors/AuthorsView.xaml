@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="library.Views.Authors.AuthorsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:library.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="2 0 2 8">
+        <materialDesign:Card
+            Background="{DynamicResource Brush.Card}"
+            BorderBrush="{DynamicResource Brush.Border}"
+            BorderThickness="1"
+            UniformCornerRadius="10"
+            >
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header de autores -->
+                <ctrls:AuthorsHeader Grid.Row="0"/>
+
+                <!-- Separación -->
+                <Separator Grid.Row="1" Margin="0,4"/>
+
+                <!-- Tabla -->
+                <ctrls:AuthorsTable Grid.Row="2"/>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

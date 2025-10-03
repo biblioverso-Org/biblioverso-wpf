@@ -119,5 +119,38 @@ namespace library.Services
             return await _conexion.ExecuteNonQueryAsync(query, parameters);
         }
 
+        public async Task<List<HistorialPrestamo>> GetHistorialByUsuarioAsync(int idUsuario)
+        {
+            var historial = new List<HistorialPrestamo>();
+
+            using var conn = _conexion.CrearConexion();
+            await conn.OpenAsync();
+
+            var query = @"SELECT id_historial, id_reserva, id_usuario, fecha_prestamo, fecha_devolucion, estado
+                  FROM historial_prestamos
+                  WHERE id_usuario = @id
+                  ORDER BY fecha_prestamo DESC";
+
+            using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", idUsuario);
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                historial.Add(new HistorialPrestamo
+                {
+                    IdHistorial = reader.GetInt64(0),
+                    IdReserva = reader.GetInt64(1),
+                    IdUsuario = reader.GetInt32(2),
+                    FechaPrestamo = reader.GetDateTime(3),
+                    FechaDevolucion = reader.IsDBNull(4) ? null : reader.GetDateTime(4),
+                    Estado = reader.IsDBNull(5) ? "" : reader.GetString(5)
+                });
+            }
+
+            return historial;
+        }
+
+
     }
 }

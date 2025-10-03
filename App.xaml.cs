@@ -46,6 +46,9 @@ namespace library
                     services.AddTransient<MembersViewModel>();
                     services.AddTransient<OrdersViewModel>();
                     services.AddTransient<LoanViewModel>();
+                    services.AddTransient<CategoriesViewModel>();
+                    services.AddTransient<AuthorsViewModel>();
+
 
                     // Registrar ventanas
                     services.AddSingleton<MainWindow>();

@@ -7,44 +7,7 @@
              x:Name="root">
 
   <UserControl.Resources>
-    <Style x:Key="PillToggle" TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignFlatButton}">
-      <Setter Property="Height" Value="36"/>
-      <Setter Property="Padding" Value="12,0"/>
-      <Setter Property="MinWidth" Value="130"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource App.BorderBrush}"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="Foreground" Value="{DynamicResource App.TextPrimaryBrush}"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="ToggleButton">
-            <Border x:Name="bd" CornerRadius="18"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}">
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <mah:PackIconMaterial x:Name="ico" Kind="ViewListOutline" Width="18" Height="18"
-                                      Foreground="{DynamicResource App.IconBrush}" Margin="0,0,8,0"/>
-                <TextBlock x:Name="label" Text="Lista" />
-              </StackPanel>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="{DynamicResource Brush.Hover}"/>
-              </Trigger>
-              <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="{DynamicResource App.PrimaryHoverBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter TargetName="ico" Property="Foreground" Value="White"/>
-                <Setter TargetName="ico" Property="Kind" Value="ViewGridOutline"/>
-                <Setter TargetName="label" Property="Text" Value="Tarjetas"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-    
+   
     <Style TargetType="controls:CustomersHeader"/>
     
   </UserControl.Resources>

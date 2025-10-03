@@ -33,6 +33,10 @@ public partial class ShellViewModel : ObservableObject
     public OrdersViewModel Orders { get; private set; }
     public TopBarViewModel TopBar { get; private set; }
     public LoanViewModel Loans { get; private set; }
+    public CategoriesViewModel Categories { get; private set; }
+    public AuthorsViewModel Authors { get; private set; }
+
+
 
     public ObservableCollection<NavigationItem> NavItems { get; } = new();
 
@@ -45,7 +49,9 @@ public partial class ShellViewModel : ObservableObject
         MembersViewModel members,
         LoanViewModel loans,
         OrdersViewModel orders,
-        TopBarViewModel topBar)
+        TopBarViewModel topBar,
+        CategoriesViewModel categories,
+        AuthorsViewModel authors)
     {
         _userSessionService = userSessionService;
         LoginViewModel = loginViewModel;
@@ -56,7 +62,8 @@ public partial class ShellViewModel : ObservableObject
         Loans = loans;
         Orders = orders;
         TopBar = topBar;
-        
+        Categories = categories;
+        Authors = authors;
         // Suscribirse a eventos del servicio de sesión
         _userSessionService.UserLoggedIn += OnUserLoggedIn;
         _userSessionService.UserLoggedOut += OnUserLoggedOut;
@@ -85,6 +92,11 @@ public partial class ShellViewModel : ObservableObject
         NavItems.Add(new NavigationItem("Reservas", PackIconMaterialKind.CalendarMonthOutline, NavSection.Primary,
             targetVm: Orders));
         NavItems.Add(new NavigationItem("Cerrar sesión", PackIconMaterialKind.LogoutVariant, NavSection.Secondary));
+        NavItems.Add(new NavigationItem("Categorías", PackIconMaterialKind.LabelOutline, NavSection.Primary,
+    targetVm: Categories));
+        NavItems.Add(new NavigationItem("Autores", PackIconMaterialKind.AccountTieOutline, NavSection.Primary,
+    targetVm: Authors));
+
     }
 
     // Eventos de autenticación
@@ -186,6 +198,13 @@ public partial class ShellViewModel : ObservableObject
         CurrentViewModel = Loans;
     }
 
+    public void NavigateToAuthors()   // ✅ NUEVO
+    {
+        if (!IsLoggedIn) return;
+        CurrentViewModel = Authors;
+    }
+
+
     public void NavigateToCustomers()
     {
         if (!IsLoggedIn) return;
@@ -197,6 +216,13 @@ public partial class ShellViewModel : ObservableObject
         if (!IsLoggedIn) return;
         CurrentViewModel = Books;
     }
+
+    public void NavigateToCategories()
+    {
+        if (!IsLoggedIn) return;
+        CurrentViewModel = Categories;
+    }
+
 
     public void NavigateToOrders()
     {

@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="library.Controls.AuthorsTable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks">
+
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <DataGrid ItemsSource="{Binding Autores}"
+              ColumnHeaderStyle="{StaticResource SlimHeader}"
+              CellStyle="{StaticResource CenterCell}"
+              HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              Background="{DynamicResource App.CardBrush}">
+        <DataGrid.RowStyle>
+            <Style TargetType="DataGridRow" BasedOn="{StaticResource SlimRow}" />
+        </DataGrid.RowStyle>
+        
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="ID" Binding="{Binding IdAutor}" Width="Auto"/>
+            <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*"/>
+            <DataGridTextColumn Header="Nacionalidad" Binding="{Binding Nacionalidad}" Width="*"/>
+            <DataGridTextColumn Header="Nacimiento" Binding="{Binding FechaNac, StringFormat=d}" Width="*"/>
+            <DataGridTextColumn Header="Muerte" Binding="{Binding FechaMuerte, StringFormat=d}" Width="*"/>
+
+            <DataGridTemplateColumn Header="Acción" Width="160">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <!-- Ver información -->
+                            <Button Style="{StaticResource GhostIconButton}"
+                                        Command="{Binding DataContext.ViewInfoAutorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                <mah:PackIconMaterial Kind="AccountDetailsOutline" Width="18" Height="18"/>
+                            </Button>
+
+                            <!-- Editar -->
+                            <Button Style="{StaticResource GhostIconButton}"
+                                        Command="{Binding DataContext.EditAutorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18"/>
+                            </Button>
+                        </StackPanel>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

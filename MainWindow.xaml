@@ -10,7 +10,9 @@
         xmlns:orders="clr-namespace:library.Views.Orders"
         xmlns:loans="clr-namespace:library.Views.Loan"
         xmlns:auth="clr-namespace:library.Views.Auth"
-        xmlns:converters="clr-namespace:library.Converters"
+        xmlns:converters="clr-namespace:library.Converters" 
+        xmlns:categories="clr-namespace:library.Views.Categories"
+        xmlns:authors="clr-namespace:library.Views.Authors"
         Background="{DynamicResource App.BackgroundBrush}"
         Foreground="{DynamicResource App.TextPrimaryBrush}"
         MinWidth="800"
@@ -41,6 +43,13 @@
         <DataTemplate DataType="{x:Type vm:LoanViewModel}">
             <loans:LoanView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CategoriesViewModel}">
+            <categories:CategoriesView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AuthorsViewModel}">
+            <authors:AuthorsView />
+        </DataTemplate>
+
     </Window.Resources>
 
     <materialDesign:DialogHost Identifier="RootDialog" Background="{DynamicResource App.BackgroundBrush}">

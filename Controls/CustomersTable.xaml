@@ -157,7 +157,7 @@
 
                 <!-- ACCIÓN -->
                 <DataGridTemplateColumn behaviors:AdaptiveColumnsBehavior.Key="Action"
-                                        CanUserSort="False" Header="ACCIÓN" Width="120">
+                                        CanUserSort="False" Header="ACCIÓN" Width="1*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -174,6 +174,23 @@
                                         CommandParameter="{Binding}">
                                     <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18"
                                                           Foreground="{DynamicResource Brush.Icon}" />
+                                </Button>
+                                <!-- Historial de préstamos -->
+                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Historial de préstamos"
+            Command="{Binding DataContext.ViewHistoryCommand,
+                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="BookClockOutline" Width="18" Height="18"
+                              Foreground="{DynamicResource Brush.Icon}" />
+                                </Button>
+
+                                <!-- Información general -->
+                                <Button Style="{StaticResource GhostIconButton}" ToolTip="Ver información general"
+            Command="{Binding DataContext.ViewInfoCommand,
+                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="AccountDetails" Width="18" Height="18"
+                              Foreground="{DynamicResource Brush.Icon}" />
                                 </Button>
                             </StackPanel>
                         </DataTemplate>
