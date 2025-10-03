@@ -10,7 +10,19 @@
         <KeyBinding Key="Enter" Command="{Binding LoginCommand}" />
     </UserControl.InputBindings>
 
-    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Convertidor inverso -->
+        <Style x:Key="InverseVisibilityConverter" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="False">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
 
     <!-- Fondo principal -->
     <Grid Background="{DynamicResource App.BackgroundBrush}">
@@ -115,7 +127,7 @@
                                  FontSize="14"
                                  Background="{DynamicResource App.SurfaceBrush}"
                                  BorderBrush="{DynamicResource App.BorderBrush}"
-                                 BorderThickness="1.5" />
+                                 BorderThickness="1.5"/>
                     </StackPanel>
 
                     <!-- Contraseña -->
