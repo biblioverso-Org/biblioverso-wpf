@@ -1,4 +1,3 @@
-<!-- Controls/ChartSummary.xaml -->
 <UserControl x:Class="library.Controls.ChartSummary"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,48 +6,42 @@
              xmlns:cdef="clr-namespace:library.Charts"
              xmlns:layout="clr-namespace:library.Layout">
 
-  <UserControl.Resources>
-    <!-- Cartesian -->
-    <DataTemplate DataType="{x:Type cdef:CartesianChartDef}">
-      <ctrls:ChartCard Title="{Binding Title}">
-        <ctrls:ChartCard.ChartContent>
-          <lvc:CartesianChart MinHeight="300"
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type cdef:CartesianChartDef}">
+            <ctrls:ChartCard Title="{Binding Title}">
+                <ctrls:ChartCard.ChartContent>
+                    <lvc:CartesianChart MinHeight="300"
                               Background="Transparent"
                               LegendPosition="Hidden"
                               Series="{Binding Series}"
                               XAxes="{Binding XAxes}"
                               YAxes="{Binding YAxes}"/>
-        </ctrls:ChartCard.ChartContent>
-      </ctrls:ChartCard>
-    </DataTemplate>
+                </ctrls:ChartCard.ChartContent>
+            </ctrls:ChartCard>
+        </DataTemplate>
 
-    <!-- Pie / Donut -->
-    <DataTemplate DataType="{x:Type cdef:PieChartDef}">
-      <ctrls:ChartCard Title="{Binding Title}">
-        <ctrls:ChartCard.ChartContent>
-          <lvc:PieChart Series="{Binding Series}"
+        <DataTemplate DataType="{x:Type cdef:PieChartDef}">
+            <ctrls:ChartCard Title="{Binding Title}">
+                <ctrls:ChartCard.ChartContent>
+                    <lvc:PieChart Series="{Binding Series}"
                         Background="Transparent"
                         LegendPosition="Right"/>
-        </ctrls:ChartCard.ChartContent>
-      </ctrls:ChartCard>
-    </DataTemplate>
+                </ctrls:ChartCard.ChartContent>
+            </ctrls:ChartCard>
+        </DataTemplate>
 
-    <!-- Espaciado entre tarjetas -->
-    <Style TargetType="ContentPresenter">
-      <Setter Property="Margin" Value="2"/>
-      <Setter Property="HorizontalAlignment" Value="Stretch"/>
-    </Style>
-  </UserControl.Resources>
+        <Style TargetType="ContentPresenter">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+    </UserControl.Resources>
 
-  <!-- Grid responsivo controlado por tus breakpoints -->
-  <ItemsControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}">
-    <ItemsControl.ItemsPanel>
-      <ItemsPanelTemplate>
-        <UniformGrid
-          layout:AdaptiveUniformGrid.Breakpoints="{Binding
-              RelativeSource={RelativeSource AncestorType=UserControl},
-              Path=Breakpoints}"/>
-      </ItemsPanelTemplate>
-    </ItemsControl.ItemsPanel>
-  </ItemsControl>
+    <ItemsControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <UniformGrid
+          layout:AdaptiveUniformGrid.Breakpoints="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Breakpoints}"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
 </UserControl>

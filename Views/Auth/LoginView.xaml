@@ -10,19 +10,7 @@
         <KeyBinding Key="Enter" Command="{Binding LoginCommand}" />
     </UserControl.InputBindings>
 
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-
-        <!-- Convertidor inverso -->
-        <Style x:Key="InverseVisibilityConverter" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="Collapsed" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsBusy}" Value="False">
-                    <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Resources>
+    
 
     <!-- Fondo principal -->
     <Grid Background="{DynamicResource App.BackgroundBrush}">
@@ -37,7 +25,7 @@
                 BorderThickness="1"
                 CornerRadius="12"
                 Padding="40,32"
-                Opacity="0">
+                >
 
             <!-- Animación de entrada -->
             <Border.Triggers>
@@ -127,9 +115,7 @@
                                  FontSize="14"
                                  Background="{DynamicResource App.SurfaceBrush}"
                                  BorderBrush="{DynamicResource App.BorderBrush}"
-                                 BorderThickness="1.5"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                 materialDesign:HintAssist.Hint="Ingresa tu usuario o email" />
+                                 BorderThickness="1.5" />
                     </StackPanel>
 
                     <!-- Contraseña -->
@@ -148,8 +134,7 @@
                                          FontSize="14"
                                          Background="{DynamicResource App.SurfaceBrush}"
                                          BorderBrush="{DynamicResource App.BorderBrush}"
-                                         BorderThickness="1.5"
-                                         materialDesign:HintAssist.Hint="Ingresa tu contraseña">
+                                         BorderThickness="1.5">
                                 <PasswordBox.Style>
                                     <Style TargetType="PasswordBox"
                                            BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}">
@@ -201,12 +186,7 @@
                         </Grid>
                     </StackPanel>
 
-                    <!-- Recordarme -->
-                    <CheckBox IsChecked="{Binding RememberMe}"
-                              Content="Recordar sesión"
-                              FontSize="13"
-                              Foreground="{DynamicResource App.TextSecondaryBrush}" />
-
+             
                 </StackPanel>
 
                 <!-- Botón Login -->
@@ -225,8 +205,7 @@
                     <Grid>
                             <!-- Contenido normal -->
                             <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Center"
-                                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}, ConverterParameter=True}">
+                                        HorizontalAlignment="Center">
                                 <mah:PackIconMaterial Kind="Login"
                                                   Width="18" Height="18"
                                                   Margin="0,0,8,0" />
@@ -234,64 +213,6 @@
                         </StackPanel>
                     </Grid>
                 </Button>
-
-                <!-- Enlaces adicionales -->
-                <WrapPanel HorizontalAlignment="Center"
-                           Orientation="Horizontal"
-                           ItemWidth="Auto">
-                    
-                    <!-- Olvidaste contraseña -->
-                    <Button Content="¿Olvidaste tu contraseña?"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="12"
-                            Foreground="{DynamicResource App.PrimaryBrush}"
-                            Command="{Binding ForgotPasswordCommand}"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Margin="4,0" />
-
-                    <!-- Separador -->
-                    <TextBlock Text="•" 
-                               Foreground="{DynamicResource App.BorderBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="12"
-                               Margin="4,0" />
-
-                    <!-- Ver usuarios BD -->
-                    <Button Content="Ver Usuarios BD"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="12"
-                            Foreground="{DynamicResource App.TextSecondaryBrush}"
-                            Command="{Binding CheckDatabaseUsersCommand}"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Margin="4,0" />
-
-                    <!-- Separador -->
-                    <TextBlock Text="•" 
-                               Foreground="{DynamicResource App.BorderBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="12"
-                               Margin="4,0" />
-
-                    <!-- Ayuda -->
-                    <Button Content="Ayuda"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="12"
-                            Foreground="{DynamicResource App.TextSecondaryBrush}"
-                            Command="{Binding ShowHelpCommand}"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Margin="4,0" />
-                </WrapPanel>
-
-                <!-- Información adicional -->
-                <TextBlock Text="Conectando con base de datos real de Supabase"
-                           FontSize="10"
-                           Foreground="{DynamicResource App.TextMutedBrush}"
-                           HorizontalAlignment="Center"
-                           Margin="0,8,0,0"
-                           FontStyle="Italic" />
 
             </StackPanel>
         </Border>

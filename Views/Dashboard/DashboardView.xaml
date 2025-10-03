@@ -9,8 +9,10 @@
                   HorizontalScrollBarVisibility="Disabled">
         <Grid Margin="0 8 8 8">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>  <!-- KPIs -->
-                <RowDefinition Height="*"/>     <!-- Charts -->
+                <RowDefinition Height="Auto"/>
+                <!-- KPIs -->
+                <RowDefinition Height="*"/>
+                <!-- Charts -->
             </Grid.RowDefinitions>
 
             <!-- KPIs -->

@@ -21,7 +21,8 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         Title="Biblioverso - Sistema de Gestión Bibliotecaria"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        >
     
     
     

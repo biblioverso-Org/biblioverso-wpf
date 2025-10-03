@@ -29,7 +29,6 @@ public partial class ShellViewModel : ObservableObject
     public DashboardViewModel Dashboard { get; private set; }
     public CustomersViewModel Customers { get; private set; }
     public BooksViewModel Books { get; private set; }
-    public MembersViewModel Members { get; private set; }
     public OrdersViewModel Orders { get; private set; }
     public TopBarViewModel TopBar { get; private set; }
     public LoanViewModel Loans { get; private set; }
@@ -47,7 +46,6 @@ public partial class ShellViewModel : ObservableObject
         DashboardViewModel dashboard,
         CustomersViewModel customers,
         BooksViewModel books,
-        MembersViewModel members,
         LoanViewModel loans,
         OrdersViewModel orders,
         TopBarViewModel topBar,
@@ -60,7 +58,6 @@ public partial class ShellViewModel : ObservableObject
         Dashboard = dashboard;
         Customers = customers;
         Books = books;
-        Members = members;
         Loans = loans;
         Orders = orders;
         TopBar = topBar;
@@ -115,7 +112,6 @@ public partial class ShellViewModel : ObservableObject
     private void OnUserLoggedIn(Usuario usuario)
     {
         UpdateAuthenticationState();
-
         NavigateToDashboard();
     }
 

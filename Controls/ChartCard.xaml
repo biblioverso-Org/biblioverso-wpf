@@ -1,4 +1,3 @@
-<!-- Controls/ChartCard.xaml -->
 <UserControl x:Class="library.Controls.ChartCard"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -20,7 +19,6 @@
                        Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                        Foreground="{DynamicResource Brush.Text}"/>
 
-            <!-- Usa ChartContent en lugar de Content -->
             <ContentPresenter Grid.Row="1"
                               Margin="0,8,0,0"
                               Content="{Binding ChartContent, RelativeSource={RelativeSource AncestorType=UserControl}}"/>

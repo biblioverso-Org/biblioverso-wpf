@@ -32,8 +32,7 @@ namespace library
 
                     // Registrar servicios
                     services.AddTransient<IAuthService, AuthService>();
-                    services.AddSingleton<IUserSessionService, UserSessionService>(); // Singleton para mantener estado
-
+                    services.AddSingleton<IUserSessionService, UserSessionService>(); // Singleton para mantener estado 
                     // Registrar ViewModels
                     services.AddTransient<DatabaseLoginViewModel>();
                     services.AddTransient<ShellViewModel>(); // Corregido: era MainWindowViewModel

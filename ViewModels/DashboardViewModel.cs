@@ -32,14 +32,14 @@ public partial class DashboardViewModel : ObservableObject
         Charts = new ObservableCollection<ChartDef>();
 
         // --- datos demo ---
-        var months   = new[] { "Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic" };
-        var loans    = new[] { 8, 10, 12, 18, 20, 26, 22, 19, 17, 21, 24, 28 };
+        var months = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
+        var loans = new[] { 8, 10, 12, 18, 20, 26, 22, 19, 17, 21, 24, 28 };
         var reservas = new[] { 3, 10, 5, 3, 7, 3, 8, 6, 4, 9, 5, 7 };
 
         // ========= 1) Barras con fondo: Reservas mensuales =========
         var cap = NiceCeil(reservas.Max() * 1.0);
         var background = Enumerable.Repeat((double)cap, months.Length).ToArray();
-        var values     = reservas.Select(v => (double)v).ToArray();
+        var values = reservas.Select(v => (double)v).ToArray();
 
         var reservasBars = new CartesianChartDef
         {
@@ -123,8 +123,8 @@ public partial class DashboardViewModel : ObservableObject
         };
 
         // ========= 3) Barras: Libros por género =========
-        var genres        = new[] { "Ficción", "Ciencia", "Historia", "Infantil", "Tecnología" };
-        var booksByGenre  = new[] { 320, 140, 210, 180, 90 };
+        var genres = new[] { "Ficción", "Ciencia", "Historia", "Infantil", "Tecnología" };
+        var booksByGenre = new[] { 320, 140, 210, 180, 90 };
 
         var booksByGenreChart = new CartesianChartDef
         {
@@ -160,7 +160,7 @@ public partial class DashboardViewModel : ObservableObject
 
         // ========= 4) Donut: Distribución por género =========
         var total = booksByGenre.Sum();
-        var dist  = booksByGenre.Select(v => 100.0 * v / total).ToArray();
+        var dist = booksByGenre.Select(v => 100.0 * v / total).ToArray();
 
         var genreDistribution = new PieChartDef
         {
@@ -193,7 +193,7 @@ public partial class DashboardViewModel : ObservableObject
 }
 
 // Otros VMs (placeholders)
-public partial class BooksViewModel   : ObservableObject { }
+public partial class BooksViewModel : ObservableObject { }
 public partial class MembersViewModel : ObservableObject { }
-public partial class OrdersViewModel  : ObservableObject { }
-public partial class SettingsViewModel: ObservableObject { }
+public partial class OrdersViewModel : ObservableObject { }
+public partial class SettingsViewModel : ObservableObject { }
