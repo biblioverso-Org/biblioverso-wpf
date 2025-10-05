@@ -7,270 +7,268 @@
              x:Name="root"
              Background="Transparent">
 
-  <UserControl.Resources>
-    <!-- Oculta textos cuando el sidebar está compacto -->
-    <conv:CollapseByWidthToVisibilityConverter x:Key="CollapseToVis" Threshold="120"/>
+    <UserControl.Resources>
+        <!-- Oculta textos cuando el sidebar está compacto -->
+        <conv:CollapseByWidthToVisibilityConverter x:Key="CollapseToVis" Threshold="120"/>
 
-    <ImageBrush x:Key="LogoBrush"
+        <!-- Recursos gráficos -->
+        <ImageBrush x:Key="LogoBrush"
                 ImageSource="pack://application:,,,/library;component/Assets/logazo.png"
-                Stretch="Uniform" />
-    <ImageBrush x:Key="AvatarBrush"
+                Stretch="Uniform"/>
+        <ImageBrush x:Key="AvatarBrush"
                 ImageSource="pack://application:,,,/library;component/Assets/21249201424022cdd93cd144f099b056.jpg"
-                Stretch="UniformToFill" />
+                Stretch="UniformToFill"/>
 
-    <!-- Botón de navegación (ahora usa brushes dinámicos) -->
-    <Style x:Key="NavButtonStyle" TargetType="Button">
-      <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="Padding" Value="8"/>
-      <Setter Property="Height" Value="40"/>
-      <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Button">
-            <Border x:Name="bg" Background="Transparent" CornerRadius="10">
-              <Grid Margin="6,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto"/>
-                  <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <!-- Botón de navegación -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bg" Background="Transparent" CornerRadius="10">
+                            <Grid Margin="6,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                <!-- ICONO -->
-                <mah:PackIconMaterial Grid.Column="0" Width="15" Height="15"
-                                      VerticalAlignment="Center" Margin="12 0 12 0"
+                                <!-- Ícono -->
+                                <mah:PackIconMaterial Grid.Column="0"
+                                      Width="15" Height="15"
+                                      VerticalAlignment="Center"
+                                      Margin="12 0 12 0"
                                       Foreground="{DynamicResource Brush.TextMuted}">
-                  <mah:PackIconMaterial.Style>
-                    <Style TargetType="{x:Type mah:PackIconMaterial}">
-                      <Setter Property="Kind" Value="{Binding Icon}"/>
-                      <Style.Triggers>
-                        <!-- Chevron según expandido -->
-                        <MultiDataTrigger>
-                          <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsToggle}" Value="True"/>
-                            <Condition Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
-                          </MultiDataTrigger.Conditions>
-                          <Setter Property="Kind" Value="ChevronLeft"/>
-                        </MultiDataTrigger>
-                        <MultiDataTrigger>
-                          <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsToggle}" Value="True"/>
-                            <Condition Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False"/>
-                          </MultiDataTrigger.Conditions>
-                          <Setter Property="Kind" Value="ChevronRight"/>
-                        </MultiDataTrigger>
-                      </Style.Triggers>
-                    </Style>
-                  </mah:PackIconMaterial.Style>
-                </mah:PackIconMaterial>
+                                    <mah:PackIconMaterial.Style>
+                                        <Style TargetType="{x:Type mah:PackIconMaterial}">
+                                            <Setter Property="Kind" Value="{Binding Icon}"/>
+                                            <Style.Triggers>
+                                                <!-- Cambia chevron si es toggle -->
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsToggle}" Value="True"/>
+                                                        <Condition Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Kind" Value="ChevronLeft"/>
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsToggle}" Value="True"/>
+                                                        <Condition Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Kind" Value="ChevronRight"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </mah:PackIconMaterial.Style>
+                                </mah:PackIconMaterial>
 
-                <!-- TÍTULO -->
-                <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center"
+                                <!-- Texto -->
+                                <TextBlock Grid.Column="1"
+                           Text="{Binding Title}"
+                           VerticalAlignment="Center"
                            Foreground="{DynamicResource Brush.Text}"
                            Visibility="{Binding ElementName=Shell, Path=ActualWidth, Converter={StaticResource CollapseToVis}}"/>
-              </Grid>
-            </Border>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bg" Property="Background" Value="{DynamicResource Brush.Hover}"/>
-              </Trigger>
+                            </Grid>
+                        </Border>
 
-              <!-- activo -->
-              <DataTrigger Binding="{Binding IsActive}" Value="True">
-                <Setter TargetName="bg" Property="Background" Value="{DynamicResource Brush.PrimarySoft}"/>
-                <Setter Property="Foreground" Value="{DynamicResource Brush.Primary}"/>
-              </DataTrigger>
+                        <!-- Estados -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource Brush.Hover}"/>
+                            </Trigger>
 
-              <!-- el toggle nunca se pinta como activo -->
-              <DataTrigger Binding="{Binding IsToggle}" Value="True">
-                <Setter TargetName="bg" Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
-              </DataTrigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
+                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource Brush.PrimarySoft}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Primary}"/>
+                            </DataTrigger>
 
-    <!-- Separador fino -->
-    <Style x:Key="ThinSeparator" TargetType="Border">
-      <Setter Property="Height" Value="1"/>
-      <Setter Property="Margin" Value="12,8"/>
-      <Setter Property="Background" Value="{DynamicResource Brush.Separator}"/>
-    </Style>
-  </UserControl.Resources>
+                            <DataTrigger Binding="{Binding IsToggle}" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-  <!-- Contenedor principal -->
-  <Border x:Name="Shell"
+        <!-- Separador fino -->
+        <Style x:Key="ThinSeparator" TargetType="Border">
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Margin" Value="12,8"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.Separator}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <!-- Contenedor principal -->
+    <Border x:Name="Shell"
           Background="{DynamicResource Brush.Card}"
           CornerRadius="10"
-          BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
-          Margin="8 7 8 8 "
+          BorderBrush="{DynamicResource Brush.Border}"
+          BorderThickness="1"
+          Margin="8,7,8,8"
           SnapsToDevicePixels="True">
-    <Border.Style>
-      <Style TargetType="Border">
-        <Setter Property="Width" Value="64"/>
-        <Style.Triggers>
-          <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="True">
-            <DataTrigger.EnterActions>
-              <BeginStoryboard>
-                <Storyboard FillBehavior="HoldEnd">
-                  <DoubleAnimation Storyboard.TargetProperty="Width"
-                                   To="240" Duration="0:0:0.25">
-                    <DoubleAnimation.EasingFunction>
-                      <CubicEase EasingMode="EaseOut"/>
-                    </DoubleAnimation.EasingFunction>
-                  </DoubleAnimation>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.EnterActions>
-            <DataTrigger.ExitActions>
-              <BeginStoryboard>
-                <Storyboard FillBehavior="HoldEnd">
-                  <DoubleAnimation Storyboard.TargetProperty="Width"
-                                   To="64" Duration="0:0:0.22">
-                    <DoubleAnimation.EasingFunction>
-                      <CubicEase EasingMode="EaseInOut"/>
-                    </DoubleAnimation.EasingFunction>
-                  </DoubleAnimation>
-                </Storyboard>
-              </BeginStoryboard>
-            </DataTrigger.ExitActions>
-          </DataTrigger>
-        </Style.Triggers>
-      </Style>
-    </Border.Style>
 
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
-
-      <!-- Header: logo + nombre -->
-      <Grid Grid.Row="0" Margin="10,10,10,6">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Border Width="30" Height="30" CornerRadius="14" HorizontalAlignment="Left" Margin="5 0 0 0"
-                Background="{StaticResource LogoBrush}" />
-
-        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0,0,0"
-                    Visibility="{Binding ElementName=Shell, Path=ActualWidth, Converter={StaticResource CollapseToVis}}">
-          <TextBlock Text="Blibioverso" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text}"/>
-        </StackPanel>
-      </Grid>
-
-      <!-- Separador -->
-      <Border Grid.Row="0" Style="{StaticResource ThinSeparator}" Margin="10,50,10,0"/>
-
-      <!-- Lista de items -->
-      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="4,6">
-          <!-- Primarios (incluye el toggle al inicio) -->
-          <ItemsControl ItemsSource="{Binding NavItems}">
-            <ItemsControl.ItemContainerStyle>
-              <Style TargetType="ContentPresenter">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Width" Value="64"/>
                 <Style.Triggers>
-                  <DataTrigger Binding="{Binding Section}" Value="{x:Static m:NavSection.Secondary}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                  </DataTrigger>
+                    <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard FillBehavior="HoldEnd">
+                                    <DoubleAnimation Storyboard.TargetProperty="Width" To="240" Duration="0:0:0.25">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard FillBehavior="HoldEnd">
+                                    <DoubleAnimation Storyboard.TargetProperty="Width" To="64" Duration="0:0:0.22">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseInOut"/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
                 </Style.Triggers>
-              </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type m:NavigationItem}">
-                <Button Style="{StaticResource NavButtonStyle}" Margin="0 2 0 2"
-                        Command="{Binding DataContext.ExecuteNavCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        CommandParameter="{Binding}"/>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
-          <!-- Separador -->
-          <Border Style="{StaticResource ThinSeparator}"/>
-
-          <!-- Secundarios -->
-          <ItemsControl ItemsSource="{Binding NavItems}">
-            <ItemsControl.ItemContainerStyle>
-              <Style TargetType="ContentPresenter">
-                <Setter Property="Visibility" Value="Collapsed"/>
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding Section}" Value="{x:Static m:NavSection.Secondary}">
-                    <Setter Property="Visibility" Value="Visible"/>
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type m:NavigationItem}">
-                <Button Style="{StaticResource NavButtonStyle}"
-                        Command="{Binding DataContext.ExecuteNavCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        CommandParameter="{Binding}"/>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-      </ScrollViewer>
-
-           <!-- Footer -->
-      <Border Grid.Row="2"
-              Background="{DynamicResource Brush.Card}"
-              BorderBrush="{DynamicResource Brush.Separator}" BorderThickness="1,1,0,0"
-              CornerRadius="0,0,14,14" Padding="10">
-        <Grid>
-          <Grid.Style>
-            <!-- Ocultar footer si no hay sesión iniciada -->
-            <Style TargetType="Grid">
-              <Setter Property="Visibility" Value="Visible"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding IsLoggedIn}" Value="False">
-                  <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-              </Style.Triggers>
             </Style>
-          </Grid.Style>
+        </Border.Style>
 
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
+        <!-- Estructura principal -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-          <Ellipse Width="30" Height="30"  Margin="5 0 0 0">
-            <Ellipse.Fill>
-                            <ImageBrush ImageSource="{Binding CurrentUser.Foto}"
-                        Stretch="UniformToFill"/>
+            <!-- Encabezado -->
+            <Grid Grid.Row="0" Margin="10,10,10,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="30" Height="30" CornerRadius="14"
+                HorizontalAlignment="Left"
+                Background="{StaticResource LogoBrush}"/>
+
+                <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="5,0,0,0"
+                    Visibility="{Binding ElementName=Shell, Path=ActualWidth, Converter={StaticResource CollapseToVis}}">
+                    <TextBlock Text="Blibioverso"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource Brush.Text}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Separador -->
+            <Border Grid.Row="0" Style="{StaticResource ThinSeparator}" Margin="10,50,10,0"/>
+
+            <!-- Cuerpo -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Ítems principales -->
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="4,6">
+                        <ItemsControl ItemsSource="{Binding NavItems}">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Section}" Value="{x:Static m:NavSection.Secondary}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type m:NavigationItem}">
+                                    <Button Style="{StaticResource NavButtonStyle}" Margin="0 2 0 2"
+                          Command="{Binding DataContext.ExecuteNavCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Ítems secundarios anclados al fondo -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="4,8">
+                    <Border Style="{StaticResource ThinSeparator}"/>
+                    <ItemsControl ItemsSource="{Binding NavItems}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Section}" Value="{x:Static m:NavSection.Secondary}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type m:NavigationItem}">
+                                <Button Style="{StaticResource NavButtonStyle}"
+                        Command="{Binding DataContext.ExecuteNavCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Grid>
+
+            <!-- Footer -->
+            <Border Grid.Row="2"
+              Background="{DynamicResource Brush.Card}"
+              BorderBrush="{DynamicResource Brush.Separator}"
+              BorderThickness="1,1,0,0"
+              CornerRadius="0,0,14,14"
+              Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse Width="30" Height="30" Margin="5,0,0,0">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding CurrentUser.Foto}" Stretch="UniformToFill"/>
                         </Ellipse.Fill>
-          </Ellipse>
+                    </Ellipse>
 
-          <StackPanel Grid.Column="1" Margin="8,0,0,0"
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0"
                       Visibility="{Binding ElementName=Shell, Path=ActualWidth, Converter={StaticResource CollapseToVis}}">
-            <!-- Nombre del usuario -->
-            <TextBlock Text="{Binding CurrentUser.DisplayName}"
+                        <TextBlock Text="{Binding CurrentUser.DisplayName}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource Brush.Text}"
                        TextTrimming="CharacterEllipsis"
                        ToolTip="{Binding CurrentUser.DisplayName}"/>
 
-            <!-- Email (o lo que tengas disponible) -->
-            <TextBlock Text="{Binding CurrentUser.Email}"
+                        <TextBlock Text="{Binding CurrentUser.Email}"
                        Foreground="{DynamicResource Brush.TextMuted}"
                        FontSize="11"
                        TextTrimming="CharacterEllipsis"
                        ToolTip="{Binding CurrentUser.Email}"/>
-
-            <!-- Rol opcional, si tienes RolDisplay -->
-            <!--
-            <TextBlock Text="{Binding CurrentUser.RolDisplay}"
-                       Foreground="{DynamicResource Brush.TextMuted}"
-                       FontSize="10"
-                       Margin="0,2,0,0"/>
-            -->
-          </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
-      </Border>
-    </Grid>
-  </Border>
+    </Border>
 </UserControl>

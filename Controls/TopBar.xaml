@@ -3,19 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:vm="clr-namespace:library.ViewModels"
              x:Name="root"
              SnapsToDevicePixels="True"
              Background="Transparent">
 
-    
-
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <converters:BoolToIconConverter x:Key="BoolToIcon" xmlns:converters="clr-namespace:library.Converters" />
-        <converters:BoolToTextConverter x:Key="BoolToText" xmlns:converters="clr-namespace:library.Converters" />
 
-        <!-- Botón de icono para el header -->
+        <!-- Botón icono -->
         <Style x:Key="HeaderIconButton" TargetType="Button">
             <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
             <Setter Property="Background" Value="Transparent" />
@@ -25,8 +21,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="bg" CornerRadius="12" Background="Transparent">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Border x:Name="bg" CornerRadius="10" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -42,112 +38,135 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- ======= TOPBAR COMO MATERIAL CARD ======= -->
-    <materialDesign:Card
-        UniformCornerRadius="10"
-        Padding="5"
-        Margin="0 8 8 8"
-        Background="{DynamicResource Brush.Card}"
-        BorderBrush="{DynamicResource Brush.Border}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+    <!-- === LAYOUT PRINCIPAL === -->
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <!-- Sección -->
+            <ColumnDefinition Width="*" />
+            <!-- Buscador -->
+            <ColumnDefinition Width="Auto"/>
+            <!-- Acciones -->
+        </Grid.ColumnDefinitions>
 
-            <!-- SEARCH PILL -->
-            <Grid>
+        <!-- ====== TÍTULO Y DESCRIPCIÓN (sin Card) ====== -->
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="4,0,16,0">
+            <TextBlock Text="{Binding SectionTitle}"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.Text}" />
+            <TextBlock Text="{Binding SectionDescription}"
+                       FontSize="13"
+                       Foreground="{DynamicResource Brush.TextMuted}"
+                       Margin="0,2,0,0" />
+        </StackPanel>
+
+        <!-- ====== BUSCADOR ====== -->
+        <materialDesign:Card Grid.Column="1"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Background="{DynamicResource Brush.Card}"
+                             BorderBrush="{DynamicResource Brush.Border}"
+                             UniformCornerRadius="10"
+                             Padding="10,4"
+                             Margin="0,0,12,0">
+            <Grid Width="340" Height="40">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />   <!-- icono -->
-                    <ColumnDefinition Width="*" />      <!-- texto -->
-                    <ColumnDefinition Width="44" />     <!-- limpiar -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Icono de búsqueda -->
-                <Button Grid.Column="0"
-                        ToolTip="Buscar"
-                        Style="{StaticResource HeaderIconButton}"
-                        Background="Transparent"
-                        BorderThickness="0">
-                    <mah:PackIconMaterial Kind="Magnify" Width="15" Height="15"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center"
-                                          Foreground="{DynamicResource Brush.TextMuted}" />
-                </Button>
+                <!-- Icono lupa -->
+                <mah:PackIconMaterial Grid.Column="0"
+                                      Kind="Magnify"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      Width="18"
+                                      Height="18"
+                                      Foreground="{DynamicResource Brush.TextMuted}" />
 
-                <!-- Caja de búsqueda -->
-                <TextBox x:Name="SearchBox" Grid.Column="1"
-                         BorderThickness="0" Background="Transparent"
-                         VerticalContentAlignment="Center" Padding="0"
+                <!-- Caja búsqueda -->
+                <TextBox Grid.Column="1"
+                         x:Name="SearchBox"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         VerticalContentAlignment="Center"
+                         Padding="8,0"
                          FontSize="14"
                          Foreground="{DynamicResource Brush.Text}"
-                         materialDesign:HintAssist.Hint="Search (Ctrl+/)"
-                         materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
-                         materialDesign:TextFieldAssist.HasClearButton="False"
+                         materialDesign:HintAssist.Hint="Buscar (Ctrl+/)"
                          Text="{Binding DataContext.GlobalSearch,
                                         RelativeSource={RelativeSource AncestorType=Window},
                                         UpdateSourceTrigger=PropertyChanged}" />
-
-                <!-- Botón limpiar -->
-                <Button Grid.Column="2"
+               
+                <!-- Limpiar -->
+                <Button Grid.Column="3"
                         Command="{Binding ClearSearchCommand}"
-                        Background="Transparent" BorderThickness="0"
-                        Width="44" Height="44">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource HeaderIconButton}">
-                            <Setter Property="Visibility" Value="Visible" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <mah:PackIconMaterial Kind="CloseCircleOutline" Width="18" Height="18"
-                                          VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Style="{StaticResource HeaderIconButton}">
+                    <mah:PackIconMaterial Kind="CloseCircleOutline"
+                                          Width="18"
+                                          Height="18"
                                           Foreground="{DynamicResource Brush.TextMuted}" />
                 </Button>
             </Grid>
+        </materialDesign:Card>
 
-            <!-- ==== ACCIONES DERECHA ==== -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal"
-                        VerticalAlignment="Center" Margin="25,0,25,0">
-
-                <!-- Toggle tema -->
-                <Button Command="{Binding ToggleThemeCommand}" Style="{StaticResource HeaderIconButton}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <mah:PackIconMaterial Width="15" Height="15"
-                                              Foreground="{DynamicResource Brush.Text}"
-                                              Kind="{Binding IsDarkTheme, Converter={StaticResource BoolToIcon},
-                                                             ConverterParameter='WeatherNight|WhiteBalanceSunny'}" />
-                    </StackPanel>
+        <!-- ====== ACCIONES DERECHA ====== -->
+        <materialDesign:Card Grid.Column="2"
+                             Background="{DynamicResource Brush.Card}"
+                             BorderBrush="{DynamicResource Brush.Border}"
+                             UniformCornerRadius="10"
+                             Padding="4"
+                             VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Margin="8,0">
+                <!-- Tema -->
+                <Button Command="{Binding ToggleThemeCommand}"
+                        Style="{StaticResource HeaderIconButton}">
+                    <mah:PackIconMaterial Width="18"
+                                          Height="18"
+                                          Foreground="{DynamicResource Brush.Text}"
+                                          Kind="{Binding IsDarkTheme,
+                                                         Converter={StaticResource BoolToIcon},
+                                                         ConverterParameter='WeatherNight|WhiteBalanceSunny'}" />
                 </Button>
 
-                <!-- Perfil usuario -->
-                <Button Style="{StaticResource HeaderIconButton}" Command="{Binding EditUserCommand}" CommandParameter="{Binding CurrentUser}">
-                    <mah:PackIconMaterial Kind="FaceManProfile" Width="15" Height="15" />
+                <!-- Usuario -->
+                <Button Style="{StaticResource HeaderIconButton}"
+                        Command="{Binding EditUserCommand}"
+                        CommandParameter="{Binding CurrentUser}">
+                    <mah:PackIconMaterial Kind="FaceManProfile"
+                                          Width="18"
+                                          Height="18" />
                 </Button>
-                
+
                 <!-- Notificaciones -->
                 <Grid>
-                    <Button Style="{StaticResource HeaderIconButton}" Command="{Binding OpenNotificationsCommand}">
-                        <mah:PackIconMaterial Kind="BellOutline" Width="15" Height="15"
-                                              Foreground="{DynamicResource Brush.Text}"
-                                              />
+                    <Button Style="{StaticResource HeaderIconButton}"
+                            Command="{Binding OpenNotificationsCommand}">
+                        <mah:PackIconMaterial Kind="BellOutline"
+                                              Width="18"
+                                              Height="18"
+                                              Foreground="{DynamicResource Brush.Text}" />
                     </Button>
-                    <Border Background="#FFEB5757" CornerRadius="8"
-                            MinWidth="15" Height="15"
-                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,2,0"
+                    <Border Background="#FFEB5757"
+                            CornerRadius="8"
+                            MinWidth="16"
+                            Height="16"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="0,0,2,0"
                             Visibility="{Binding HasNotifications, Converter={StaticResource BoolToVis}}">
-                        <TextBlock Text="{Binding NotificationsCount}" Foreground="White"
-                                   FontSize="10" FontWeight="Bold"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding NotificationsCount}"
+                                   Foreground="White"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
                     </Border>
                 </Grid>
             </StackPanel>
-        </Grid>
-    </materialDesign:Card>
+        </materialDesign:Card>
+    </Grid>
 </UserControl>

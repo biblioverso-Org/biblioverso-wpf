@@ -20,9 +20,9 @@ public partial class DashboardViewModel : ObservableObject
         new DashStat("Reservas activas",           97,  -5, PackIconMaterialKind.CalendarMonth),
         new DashStat("Usuarios activos (30d)",    612,  42, PackIconMaterialKind.AccountGroup),
         new DashStat("Nuevos títulos (mes)",       64,   8, PackIconMaterialKind.BookPlus),
-        new DashStat("Renovaciones (mes)",        153,  12, PackIconMaterialKind.Autorenew),
-
     };
+
+
 
     // Colección de definiciones de charts que consumirá ChartSummary
     public ObservableCollection<ChartDef> Charts { get; }

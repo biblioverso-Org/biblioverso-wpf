@@ -22,7 +22,7 @@
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <!-- Panel responsivo con tus breakpoints -->
-                <UniformGrid layout:AdaptiveUniformGrid.Breakpoints="1300=4;960=3;640=2;0=1"
+                <UniformGrid layout:AdaptiveUniformGrid.Breakpoints="1300=5;960=5;640=2;0=1"
                              layout:AdaptiveUniformGrid.HorizontalPadding="0"/>
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>

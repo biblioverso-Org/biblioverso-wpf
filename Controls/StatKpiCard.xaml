@@ -4,13 +4,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             MinWidth="240" Height="92"
+             MinWidth="150" Height="85"
              HorizontalAlignment="Stretch">
   <materialDesign:Card Padding="14"
                        Background="{DynamicResource Brush.Card}"
                        BorderBrush="{DynamicResource Brush.Border}"
                        BorderThickness="1"
-                       UniformCornerRadius="12">
+                       UniformCornerRadius="10">
     <Grid>
       <!-- Icono -->
       <Border Width="28" Height="28" CornerRadius="6"
