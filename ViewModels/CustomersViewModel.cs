@@ -54,7 +54,6 @@ namespace library.ViewModels
             var clientes = await _service.GetClientesAsync();
             foreach (var c in clientes) Customers.Add(c);
 
-            UpdateStats();
         }
 
         // ===================== Agregar cliente =====================
@@ -177,25 +176,7 @@ namespace library.ViewModels
             CustomersView.Refresh();
         }
 
-        // ===================== Estadísticas =====================
-        private void UpdateStats()
-        {
-            Stats.Clear();
-
-            int total = Customers.Count;
-            int nuevos = Customers.Count(c => c.FechaCreacion.HasValue &&
-                                               c.FechaCreacion.Value > DateTime.Now.AddDays(-30));
-            int activos = Customers.Count(c => c.FechaActualizacion.HasValue &&
-                                               c.FechaActualizacion.Value > DateTime.Now.AddDays(-15));
-
-            int deltaTotal = 0;
-            int deltaNuevos = nuevos;
-            int deltaActivos = activos - (int)(total * 0.1);
-
-            Stats.Add(new DashStat("Usuarios Totales", total, deltaTotal, PackIconMaterialKind.AccountGroup));
-            Stats.Add(new DashStat("Usuarios Nuevos", nuevos, deltaNuevos, PackIconMaterialKind.AccountPlus));
-            Stats.Add(new DashStat("Usuarios Activos", activos, deltaActivos, PackIconMaterialKind.AccountCheck));
-        }
+       
 
         // ===================== Ver historial =====================
         private async Task ViewHistoryAsync(Usuario? c)

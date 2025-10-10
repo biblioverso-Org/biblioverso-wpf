@@ -1,52 +1,82 @@
 ﻿<UserControl x:Class="library.Controls.CategoriesTable"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:converters="clr-namespace:library.Converters">
 
-
+    <!-- ===== Recursos ===== -->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-</ResourceDictionary>
+
+            <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
+        </ResourceDictionary>
     </UserControl.Resources>
 
-    
     <Grid>
+        <!-- ===== TABLA DE CATEGORÍAS ===== -->
         <DataGrid ItemsSource="{Binding Categorias}"
                   ColumnHeaderStyle="{StaticResource SlimHeader}"
-  CellStyle="{StaticResource CenterCell}"
-  HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
-                
+                  CellStyle="{StaticResource CenterCell}"
+                  HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   HeadersVisibility="Column"
-                  Background="{DynamicResource App.CardBrush}">
+                  Background="{DynamicResource App.CardBrush}"
+                  RowHeaderWidth="0"
+                  SelectionUnit="FullRow"
+                  materialDesign:DataGridAssist.CellPadding="12,8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12,10"
+                  Visibility="{Binding Categorias.Count, 
+                                       Converter={StaticResource CountToVisibility}, 
+                                       ConverterParameter=HasItems}">
+
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow" BasedOn="{StaticResource SlimRow}" />
             </DataGrid.RowStyle>
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding IdCategoria}" Width="Auto"/>
-                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                <!-- ID -->
+                <DataGridTextColumn Header="ID"
+                                    Binding="{Binding IdCategoria}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- NOMBRE -->
+                <DataGridTextColumn Header="NOMBRE"
+                                    Binding="{Binding Nombre}"
+                                    Width="*"
+                                    ElementStyle="{StaticResource CellTextCenter}" />
 
                 <!-- ACCIÓN -->
-                <DataGridTemplateColumn Header="Acción" Width="120">
+                <DataGridTemplateColumn Header="ACCIÓN" Width="120" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <!-- Editar -->
-                                <Button Style="{StaticResource GhostIconButton}" 
-                                        Command="{Binding DataContext.EditCategoriaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                <Button Style="{StaticResource GhostIconButton}"
+                                        ToolTip="Editar categoría"
+                                        Command="{Binding DataContext.EditCategoriaCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}">
-                                    <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18"/>
+                                    <mah:PackIconMaterial Kind="SquareEditOutline"
+                                                          Width="18" Height="18"
+                                                          Foreground="#6B7280" />
                                 </Button>
+
                                 <!-- Eliminar -->
-                                <Button Style="{StaticResource GhostIconButton}" 
-                                        Command="{Binding DataContext.DeleteCategoriaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                <Button Style="{StaticResource GhostIconButton}"
+                                        Margin="6,0,0,0"
+                                        ToolTip="Eliminar categoría"
+                                        Command="{Binding DataContext.DeleteCategoriaCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}">
-                                    <mah:PackIconMaterial Kind="TrashCanOutline" Width="18" Height="18"/>
+                                    <mah:PackIconMaterial Kind="TrashCanOutline"
+                                                          Width="18" Height="18"
+                                                          Foreground="#6B7280" />
                                 </Button>
                             </StackPanel>
                         </DataTemplate>
@@ -54,5 +84,34 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- ===== ESTADO VACÍO ===== -->
+        <StackPanel Visibility="{Binding Categorias.Count, 
+                                          Converter={StaticResource CountToVisibility}, 
+                                          ConverterParameter=Empty}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    Orientation="Vertical"
+                    Width="400">
+            <mah:PackIconMaterial Kind="TagMultipleOutline"
+                                  Width="64" Height="64"
+                                  Foreground="{DynamicResource App.IconBrush}"
+                                  HorizontalAlignment="Center"/>
+            <TextBlock Text="No hay categorías registradas"
+                       FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource App.TextPrimaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBlock Text="Agrega una nueva categoría para clasificar tus libros de forma más organizada."
+                       FontSize="13"
+                       Foreground="{DynamicResource App.TextSecondaryBrush}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0"/>
+            <Button Content="Agregar categoría"
+                    Command="{Binding AddCategoriaCommand}"
+                    HorizontalAlignment="Center"
+                    Margin="0,14,0,0"/>
+        </StackPanel>
     </Grid>
 </UserControl>

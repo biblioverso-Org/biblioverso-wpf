@@ -1,56 +1,128 @@
 ﻿<UserControl x:Class="library.Controls.AuthorsTable"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks">
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:library.Converters">
 
-
+    <!-- ===== Recursos ===== -->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
         </ResourceDictionary>
     </UserControl.Resources>
-    
-    <DataGrid ItemsSource="{Binding Autores}"
-              ColumnHeaderStyle="{StaticResource SlimHeader}"
-              CellStyle="{StaticResource CenterCell}"
-              HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              Background="{DynamicResource App.CardBrush}">
-        <DataGrid.RowStyle>
-            <Style TargetType="DataGridRow" BasedOn="{StaticResource SlimRow}" />
-        </DataGrid.RowStyle>
-        
-        <DataGrid.Columns>
-            <DataGridTextColumn Header="ID" Binding="{Binding IdAutor}" Width="Auto"/>
-            <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*"/>
-            <DataGridTextColumn Header="Nacionalidad" Binding="{Binding Nacionalidad}" Width="*"/>
-            <DataGridTextColumn Header="Nacimiento" Binding="{Binding FechaNac, StringFormat=d}" Width="*"/>
-            <DataGridTextColumn Header="Muerte" Binding="{Binding FechaMuerte, StringFormat=d}" Width="*"/>
 
-            <DataGridTemplateColumn Header="Acción" Width="160">
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <!-- Ver información -->
-                            <Button Style="{StaticResource GhostIconButton}"
+    <Grid>
+        <!-- ===== TABLA DE AUTORES ===== -->
+        <DataGrid ItemsSource="{Binding Autores}"
+                  ColumnHeaderStyle="{StaticResource SlimHeader}"
+                  CellStyle="{StaticResource CenterCell}"
+                  HorizontalGridLinesBrush="{DynamicResource RowSeparator}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Background="{DynamicResource App.CardBrush}"
+                  RowHeaderWidth="0"
+                  SelectionUnit="FullRow"
+                  materialDesign:DataGridAssist.CellPadding="12,8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12,10"
+                  Visibility="{Binding Autores.Count, 
+                                       Converter={StaticResource CountToVisibility}, 
+                                       ConverterParameter=HasItems}">
+
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource SlimRow}" />
+            </DataGrid.RowStyle>
+
+            <DataGrid.Columns>
+                <!-- ID -->
+                <DataGridTextColumn Header="ID" 
+                                    Binding="{Binding IdAutor}" 
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- Nombre -->
+                <DataGridTextColumn Header="NOMBRE" 
+                                    Binding="{Binding Nombre}" 
+                                    Width="2*" 
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- Nacionalidad -->
+                <DataGridTextColumn Header="NACIONALIDAD" 
+                                    Binding="{Binding Nacionalidad}" 
+                                    Width="*" 
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- Fecha Nacimiento -->
+                <DataGridTextColumn Header="NACIMIENTO" 
+                                    Binding="{Binding FechaNac, StringFormat={}{0:dd/MM/yyyy}}" 
+                                    Width="*" 
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- Fecha Muerte -->
+                <DataGridTextColumn Header="MUERTE" 
+                                    Binding="{Binding FechaMuerte, StringFormat={}{0:dd/MM/yyyy}}" 
+                                    Width="*" 
+                                    ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- Acción -->
+                <DataGridTemplateColumn Header="ACCIÓN" Width="160" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <!-- Ver información -->
+                                <Button Style="{StaticResource GhostIconButton}"
+                                        ToolTip="Ver información del autor"
                                         Command="{Binding DataContext.ViewInfoAutorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}">
-                                <mah:PackIconMaterial Kind="AccountDetailsOutline" Width="18" Height="18"/>
-                            </Button>
+                                    <mah:PackIconMaterial Kind="AccountDetailsOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
 
-                            <!-- Editar -->
-                            <Button Style="{StaticResource GhostIconButton}"
+                                <!-- Editar -->
+                                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                                        ToolTip="Editar autor"
                                         Command="{Binding DataContext.EditAutorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}">
-                                <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18"/>
-                            </Button>
-                        </StackPanel>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-        </DataGrid.Columns>
-    </DataGrid>
+                                    <mah:PackIconMaterial Kind="SquareEditOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- ===== ESTADO VACÍO ===== -->
+        <StackPanel Visibility="{Binding Autores.Count, 
+                                          Converter={StaticResource CountToVisibility}, 
+                                          ConverterParameter=Empty}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    Orientation="Vertical"
+                    Width="400">
+            <mah:PackIconMaterial Kind="AccountMultipleOutline"
+                                  Width="64" Height="64"
+                                  Foreground="{DynamicResource App.IconBrush}"
+                                  HorizontalAlignment="Center"/>
+            <TextBlock Text="No hay autores registrados"
+                       FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource App.TextPrimaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBlock Text="Agrega un nuevo autor para comenzar a asociarlo a tus libros."
+                       FontSize="13"
+                       Foreground="{DynamicResource App.TextSecondaryBrush}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0"/>
+            <Button Content="Agregar autor"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding AddAutorAsyncCommand}"
+                    HorizontalAlignment="Center"
+                    Margin="0,14,0,0"/>
+        </StackPanel>
+    </Grid>
 </UserControl>

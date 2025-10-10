@@ -63,14 +63,6 @@ namespace library.ViewModels
             var libros = await _service.GetLibrosAsync();
             foreach (var l in libros) Libros.Add(l);
 
-            Stats.Clear();
-            Stats.Add(new DashStat("Libros Totales", Libros.Count, 0, PackIconMaterialKind.BookMultipleOutline));
-            Stats.Add(new DashStat("Libros Disponibles",
-                Libros.Count(b => b.Stocks.Any(s => s.Disponibilidad)), 0,
-                PackIconMaterialKind.BookCheckOutline));
-            Stats.Add(new DashStat("Libros Prestados",
-                Libros.Count(b => b.Stocks.All(s => !s.Disponibilidad)), 0,
-                PackIconMaterialKind.BookOpenVariant));
         }
 
         private async Task ManageStockAsync(Libro? libro)
