@@ -14,5 +14,6 @@ namespace library.Models
         public DateTime? FechaNac { get; set; }
         public DateTime? FechaMuerte { get; set; }
         public string? Biografia { get; set; }
+        public string? Foto { get; set; }
     }
 }

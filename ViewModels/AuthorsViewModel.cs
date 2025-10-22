@@ -45,12 +45,41 @@ namespace library.ViewModels
             var view = new AuthorDialog { DataContext = vm };
             var result = await DialogHost.Show(view, "RootDialog");
 
-            if (result is Autor updated)
+            if (result is AuthorDialogViewModel m)
             {
-                await _service.UpdateAsync(updated);
-                await LoadAutoresAsync();
+                try
+                {
+                    var cloudService = new CloudinaryService(
+                        "dvw5h3ccw",
+                        "893598289963378",
+                        "mKNQQGTlypYx947y0F72jpnzb88"
+                    );
+
+                    string? fotoUrl = autor.Foto;
+
+                    // 📤 Subir nueva imagen si seleccionó una local
+                    if (!string.IsNullOrEmpty(m.Foto) && !m.Foto.StartsWith("https://"))
+                    {
+                        fotoUrl = await cloudService.UploadImageAsync(m.Foto, "autores");
+                    }
+
+                    autor.Nombre = m.Nombre;
+                    autor.Nacionalidad = m.Nacionalidad;
+                    autor.FechaNac = m.FechaNac;
+                    autor.FechaMuerte = m.FechaMuerte;
+                    autor.Biografia = m.Biografia;
+                    autor.Foto = fotoUrl;
+
+                    await _service.UpdateAsync(autor);
+                    await LoadAutoresAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"⚠️ Error al actualizar autor:\n{ex.Message}");
+                }
             }
         }
+
 
         private async Task ViewInfoAutorAsync(Autor? autor)
         {

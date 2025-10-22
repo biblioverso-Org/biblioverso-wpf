@@ -38,11 +38,19 @@
             </DataGrid.RowStyle>
 
             <DataGrid.Columns>
-                <!-- ID -->
-                <DataGridTextColumn Header="ID" 
-                                    Binding="{Binding IdAutor}" 
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource CellTextCenter}" />
+               
+                <DataGridTemplateColumn Header="FOTO" Width="Auto" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Width="40" Height="40" CornerRadius="100"  HorizontalAlignment="Center">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding Foto}"/>
+                                </Border.Background>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
 
                 <!-- Nombre -->
                 <DataGridTextColumn Header="NOMBRE" 

@@ -143,7 +143,6 @@
                 </DataGridTemplateColumn>
 
                 <!-- ACCIONES -->
-                <!-- ACCIONES -->
                 <DataGridTemplateColumn Header="ACCIÓN" Width="200" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -204,7 +203,7 @@
                                     <Setter TargetName="btnCancelar" Property="Visibility" Value="Visible"/>
                                     <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
                                     <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
 
                                 <!-- Estado: espera -->
@@ -212,8 +211,8 @@
                                     <Setter TargetName="btnListo" Property="Visibility" Value="Collapsed"/>
                                     <Setter TargetName="btnCancelar" Property="Visibility" Value="Collapsed"/>
                                     <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
 
                                 <!-- Estado: recoger -->
@@ -222,7 +221,7 @@
                                     <Setter TargetName="btnCancelar" Property="Visibility" Value="Visible"/>
                                     <Setter TargetName="btnCompletada" Property="Visibility" Value="Visible"/>
                                     <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
 
                                 <!-- Estado: cancelado -->
@@ -231,7 +230,7 @@
                                     <Setter TargetName="btnCancelar" Property="Visibility" Value="Collapsed"/>
                                     <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
                                     <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
-                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
 
                                 <!-- Estado: completado -->

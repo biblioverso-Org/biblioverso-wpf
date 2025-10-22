@@ -2,9 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using library.Models;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using System;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace library.ViewModels
 {
@@ -17,6 +16,12 @@ namespace library.ViewModels
         [ObservableProperty] private DateTime? fechaMuerte;
         [ObservableProperty] private string? biografia;
 
+        // 🖼️ Nueva propiedad: ruta o URL de la foto
+        [ObservableProperty] private string? foto;
+
+        // 🖼️ Vista previa (local o desde Cloudinary)
+        [ObservableProperty] private string? fotoPreview;
+
         public AuthorDialogViewModel() { }
 
         public AuthorDialogViewModel(Autor autor)
@@ -27,22 +32,33 @@ namespace library.ViewModels
             FechaNac = autor.FechaNac;
             FechaMuerte = autor.FechaMuerte;
             Biografia = autor.Biografia;
+            Foto = autor.Foto;
+            FotoPreview = autor.Foto;
         }
 
+        // 📸 Permitir al usuario seleccionar una imagen desde el explorador
+        [RelayCommand]
+        private void SelectImage()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Title = "Seleccionar imagen del autor",
+                Filter = "Imágenes (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                Foto = dlg.FileName;
+                FotoPreview = dlg.FileName;
+            }
+        }
+
+        // 💾 Guardar cambios
         [RelayCommand]
         private void Save()
         {
-            var autor = new Autor
-            {
-                IdAutor = IdAutor,
-                Nombre = Nombre,
-                Nacionalidad = Nacionalidad,
-                FechaNac = FechaNac,
-                FechaMuerte = FechaMuerte,
-                Biografia = Biografia
-            };
-
-            DialogHost.Close("RootDialog", autor);
+            DialogHost.Close("RootDialog", this);
         }
+
     }
 }
