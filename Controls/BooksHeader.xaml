@@ -25,7 +25,7 @@
     </Grid.ColumnDefinitions>
 
     <!-- Título -->
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" Visibility="Hidden">
       <TextBlock Text="Libros"
                  FontWeight="SemiBold"
                  Margin="10"

@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="library.Dialogs.LoanLostDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             MinWidth="540" MaxWidth="720" MaxHeight="460">
+
+    <Border Padding="22"
+            Background="{DynamicResource App.CardBrush}"
+            BorderBrush="{DynamicResource App.BorderBrush}"
+            BorderThickness="1" CornerRadius="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <mah:PackIconMaterial Kind="BookRemoveOutline" Width="20" Height="20"
+                                      Foreground="#DC2626" Margin="0,0,8,0"/>
+                <TextBlock Text="Marcar libro como perdido" FontSize="20" FontWeight="SemiBold"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+            </StackPanel>
+
+            <!-- CONTENT -->
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="{Binding Libro.Titulo}" FontWeight="SemiBold" FontSize="15"
+                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+                <TextBlock Text="{Binding Usuario.NombreCompleto}" Foreground="#6B7280" Margin="0,4,0,10"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Motivo de la pérdida"
+                         Text="{Binding Motivo}" Margin="0,0,0,10"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Monto de la multa (Bs)"
+                         Text="{Binding Monto}" Margin="0,0,0,10"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding NotificarUsuario}" VerticalAlignment="Center"/>
+                    <TextBlock Text="Enviar notificación al usuario" Margin="6,0,0,0"
+                               Foreground="{DynamicResource App.TextPrimaryBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- FOOTER -->
+            <DockPanel Grid.Row="2" Margin="0,16,0,0" LastChildFill="False">
+                <!-- Cancelar -->
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+            Command="{Binding CancelarCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="Close" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Cancelar"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Confirmar -->
+                <Button DockPanel.Dock="Right"
+            IsEnabled="{Binding Prestamo}"
+            Command="{Binding ConfirmarCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <mah:PackIconMaterial Kind="AlertCircleCheck" Width="18" Height="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Confirmar pérdida"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+
+        </Grid>
+    </Border>
+</UserControl>

@@ -12,56 +12,116 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
+            <converters:UserToImageConverter x:Key="UserToImageConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
-        <!-- ===== TABLA DE PRÉSTAMOS ===== -->
+        <!-- ===================== TABLA PRINCIPAL ===================== -->
         <DataGrid ItemsSource="{Binding LoansView}"
-                  Background="{DynamicResource App.CardBrush}"
                   AutoGenerateColumns="False"
-                  CanUserAddRows="False"
+                  Background="{DynamicResource App.CardBrush}"
                   HeadersVisibility="Column"
                   ColumnHeaderStyle="{StaticResource SlimHeader}"
                   RowStyle="{StaticResource SlimRow}"
                   CellStyle="{StaticResource CenterCell}"
-                  HorizontalGridLinesBrush="{StaticResource RowSeparator}"
-                  RowHeaderWidth="0"
-                  IsReadOnly="True"
                   materialDesign:DataGridAssist.CellPadding="12,8"
                   materialDesign:DataGridAssist.ColumnHeaderPadding="12,10"
-                  VerticalAlignment="Stretch"
-                  HorizontalAlignment="Stretch"
-                  Visibility="{Binding Loans.Count, 
-                                       Converter={StaticResource CountToVisibility}, 
-                                       ConverterParameter=HasItems}">
+                  HorizontalGridLinesBrush="{StaticResource RowSeparator}"
+                  VerticalGridLinesBrush="{x:Null}"
+                  RowHeaderWidth="0"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  GridLinesVisibility="None"
+                  Visibility="{Binding Loans.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=HasItems}">
 
+            <!-- ===================== AGRUPACIÓN CON EXPANDER ===================== -->
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="GroupItem">
+                            <Setter Property="Margin" Value="-12"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="GroupItem">
+                                        <Expander IsExpanded="True"
+                                                  Background="#F9FAFB"
+                                                  BorderThickness="0"
+                                                  Margin="0,4,0,0">
+                                            <Expander.Header>
+                                                <Border Background="#F9FAFB"
+                                                        BorderThickness="0,1,0,0"
+                                                        BorderBrush="#E5E7EB"
+                                                        Padding="16"
+                                                        Margin="-12,0,-12,0">
+                                                    <Grid VerticalAlignment="Center">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- 🧍 Información de usuario -->
+                                                        <StackPanel Grid.Column="1"
+                                                                    Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    Margin="6,0,0,0">
+                                                            <Ellipse Width="35" Height="35" Margin="0,0,8,0">
+                                                                <Ellipse.Fill>
+                                                                    <ImageBrush ImageSource="{Binding Items[0].Usuario.Foto}" Stretch="UniformToFill"/>
+                                                                </Ellipse.Fill>
+                                                            </Ellipse>
+                                                            <StackPanel VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Name}"
+                                                                           FontWeight="SemiBold"
+                                                                           FontSize="13"
+                                                                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
+                                                                <TextBlock Text="{Binding ItemCount, StringFormat={}{0} préstamo(s)}"
+                                                                           FontSize="11"
+                                                                           Foreground="#6B7280"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+
+                                                        <!-- 🔁 Botón acción (Devolver todos) -->
+                                                        <Button Grid.Column="2"
+                                                                Style="{StaticResource GhostIconButton}"
+                                                                ToolTip="Devolver todos los préstamos"
+                                                                Command="{Binding DataContext.ReturnAllCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding Items[0].Usuario.IdUsuario}">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <mah:PackIconMaterial Kind="BookCheckOutline"
+                                                                                      Width="18" Height="18"
+                                                                                      Foreground="#059669"/>
+                                                               
+                                                            </StackPanel>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </Expander.Header>
+
+                                            <!-- 📋 Contenido (préstamos del grupo) -->
+                                            <ItemsPresenter Margin="12,6,0,6"/>
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+
+            <!-- ===================== COLUMNAS ===================== -->
             <DataGrid.Columns>
-                <!-- MIEMBRO -->
-                <DataGridTemplateColumn Header="MIEMBRO" Width="2*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Ellipse Width="32" Height="32" Margin="0,0,8,0">
-                                    <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{Binding Usuario.Foto}" Stretch="UniformToFill"/>
-                                    </Ellipse.Fill>
-                                </Ellipse>
-                                <TextBlock Text="{Binding Usuario.NombreCompleto}" 
-                                           VerticalAlignment="Center"
-                                           Foreground="{DynamicResource App.TextPrimaryBrush}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
                 <!-- LIBRO -->
                 <DataGridTemplateColumn Header="LIBRO" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Libro.Portada}" Width="32" Height="48" Margin="0,0,8,0"/>
                                 <TextBlock Text="{Binding Libro.Titulo}" VerticalAlignment="Center"
+                                           FontWeight="SemiBold"
                                            Foreground="{DynamicResource App.TextPrimaryBrush}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -71,42 +131,43 @@
                 <!-- FECHA PRÉSTAMO -->
                 <DataGridTextColumn Header="PRÉSTAMO"
                                     Binding="{Binding FechaPrestamo, StringFormat={}{0:dd/MM/yyyy}}"
-                                    Width="*" 
+                                    Width="*"
                                     ElementStyle="{StaticResource CellTextCenter}" />
 
                 <!-- FECHA VENCIMIENTO -->
                 <DataGridTextColumn Header="VENCIMIENTO"
                                     Binding="{Binding FechaVencimiento, StringFormat={}{0:dd/MM/yyyy}}"
-                                    Width="*" 
+                                    Width="*"
                                     ElementStyle="{StaticResource CellTextCenter}" />
 
                 <!-- ESTADO -->
-                <DataGridTemplateColumn Header="ESTADO" Width="*" CanUserSort="False">
+                <DataGridTemplateColumn Header="ESTADO" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border x:Name="chip"
-                                    Padding="6,2" CornerRadius="10"
-                                    BorderThickness="1"
-                                    HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Estado}"
-                                           FontSize="12" FontWeight="SemiBold"/>
+                            <Border x:Name="chip" Padding="6,2" CornerRadius="10" BorderThickness="1" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Estado}" FontSize="12" FontWeight="SemiBold"/>
                             </Border>
-
-                            <!-- ESTILOS SEGÚN ESTADO -->
                             <DataTemplate.Triggers>
+                                <!-- ACTIVO -->
                                 <DataTrigger Binding="{Binding Estado}" Value="activo">
                                     <Setter TargetName="chip" Property="Background" Value="#DBEAFE"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#2563EB"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#1E3A8A"/>
                                 </DataTrigger>
-
+                                <!-- DEVUELTO -->
                                 <DataTrigger Binding="{Binding Estado}" Value="devuelto">
                                     <Setter TargetName="chip" Property="Background" Value="#D1FAE5"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#059669"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#064E3B"/>
                                 </DataTrigger>
-
+                                <!-- VENCIDO -->
                                 <DataTrigger Binding="{Binding Estado}" Value="vencido">
+                                    <Setter TargetName="chip" Property="Background" Value="#FEF3C7"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#F59E0B"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#78350F"/>
+                                </DataTrigger>
+                                <!-- PERDIDO -->
+                                <DataTrigger Binding="{Binding Estado}" Value="perdido">
                                     <Setter TargetName="chip" Property="Background" Value="#FEE2E2"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#DC2626"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#7F1D1D"/>
@@ -115,13 +176,44 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <!-- ACCIÓN -->
+                <DataGridTemplateColumn Header="ACCIÓN" Width="170">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <!-- Información -->
+                                <Button Style="{StaticResource GhostIconButton}"
+                                        ToolTip="Ver información del préstamo"
+                                        Command="{Binding DataContext.ShowInfoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="InformationOutline" Width="18" Height="18" Foreground="#2563EB"/>
+                                </Button>
+
+                                <!-- Devolver -->
+                                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                                        ToolTip="Registrar devolución de este libro"
+                                        Command="{Binding DataContext.MarkReturnedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="BookCheckOutline" Width="18" Height="18" Foreground="#059669"/>
+                                </Button>
+
+                                <!-- Perdido -->
+                                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                                        ToolTip="Marcar libro como perdido"
+                                        Command="{Binding DataContext.MarkLostCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="BookRemoveOutline" Width="18" Height="18" Foreground="#DC2626"/>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- ===== ESTADO VACÍO ===== -->
-        <StackPanel Visibility="{Binding Loans.Count, 
-                                          Converter={StaticResource CountToVisibility}, 
-                                          ConverterParameter=Empty}"
+        <!-- ===================== MENSAJE SIN PRÉSTAMOS ===================== -->
+        <StackPanel Visibility="{Binding Loans.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=Empty}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     Margin="20"
@@ -135,13 +227,12 @@
                        FontSize="18" FontWeight="SemiBold"
                        Foreground="{DynamicResource App.TextPrimaryBrush}"
                        HorizontalAlignment="Center" Margin="0,10,0,0"/>
-            <TextBlock Text="Registra un nueva reserva para empezar a gestionar los prestamos."
+            <TextBlock Text="Registra una nueva reserva para empezar a gestionar los préstamos."
                        FontSize="13"
                        Foreground="{DynamicResource App.TextSecondaryBrush}"
                        TextAlignment="Center"
                        TextWrapping="Wrap"
                        Margin="0,4,0,0"/>
-            
         </StackPanel>
     </Grid>
 </UserControl>

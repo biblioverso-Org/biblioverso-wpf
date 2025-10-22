@@ -19,7 +19,7 @@
     </Grid.ColumnDefinitions>
 
     <!-- Izquierda: Título -->
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" Visibility="Hidden">
       <TextBlock Text="{Binding Title, ElementName=root, FallbackValue=Clientes}"
                  FontWeight="SemiBold" Margin="10"
                  FontSize="16" Foreground="{DynamicResource TitleFg}"/>

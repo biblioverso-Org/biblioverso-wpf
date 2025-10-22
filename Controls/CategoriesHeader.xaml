@@ -13,6 +13,7 @@
 
         <StackPanel Orientation="Horizontal"
          Grid.Column="0"
+                    Visibility="Hidden"
          VerticalAlignment="Center">
             <TextBlock Text="Categorias"
           FontWeight="SemiBold"

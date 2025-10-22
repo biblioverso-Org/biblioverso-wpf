@@ -2,6 +2,7 @@
 using library.Models;
 using Npgsql;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace library.Services
@@ -10,46 +11,24 @@ namespace library.Services
     {
         private readonly Conexion _conexion = new Conexion();
 
-        /// <summary>
-        /// Crear un nuevo préstamo (cuando el usuario recoge un libro reservado).
-        /// </summary>
-        public async Task<long> CrearPrestamoAsync(int idUsuario, long idLibro, long idStock,DateTime loanStart, DateTime dueDate)
-        {
-            var query = @"INSERT INTO prestamo 
-                  (id_usuario, id_libro, id_stock, fecha_prestamo, fecha_vencimiento, estado)
-                  VALUES (@usuario, @libro, @stock, @fecha_prestamo, @fecha_vencimiento, 'activo')
-                  RETURNING id_prestamo";
-
-            var param = new[]
-            {
-                new NpgsqlParameter("@usuario", idUsuario),
-                new NpgsqlParameter("@libro", idLibro),
-                new NpgsqlParameter("@stock", idStock),
-                new NpgsqlParameter("@fecha_prestamo", loanStart),
-                new NpgsqlParameter("@fecha_vencimiento", dueDate)
-            };
-
-            return (long)(await _conexion.ExecuteScalarAsync(query, param))!;
-        }
-
         public async Task<List<Prestamo>> ObtenerPrestamosAsync()
         {
             var query = @"
-        SELECT p.id_prestamo, p.id_usuario, p.id_libro, p.id_stock,
-               p.fecha_prestamo, p.fecha_devolucion, p.fecha_vencimiento, p.estado,
-               u.nombre, u.apellido, u.usuario, u.foto,
-               l.titulo, l.portada
-        FROM prestamo p
-        INNER JOIN usuario u ON u.id_usuario = p.id_usuario
-        INNER JOIN libro l ON l.id_libro = p.id_libro
-        ORDER BY p.fecha_prestamo DESC";
+                SELECT p.id_prestamo, p.id_usuario, p.id_libro, p.id_stock,
+                       p.fecha_prestamo, p.fecha_devolucion, p.fecha_vencimiento, p.estado,
+                       u.nombre, u.apellido, u.usuario, u.foto,
+                       l.titulo, l.portada
+                FROM prestamo p
+                INNER JOIN usuario u ON u.id_usuario = p.id_usuario
+                INNER JOIN libro l ON l.id_libro = p.id_libro
+                ORDER BY p.fecha_prestamo DESC;";
 
             var lista = new List<Prestamo>();
 
             using var reader = await _conexion.ExecuteReaderAsync(query);
             while (await reader.ReadAsync())
             {
-                var prestamo = new Prestamo
+                var p = new Prestamo
                 {
                     IdPrestamo = reader.GetInt64(0),
                     IdUsuario = reader.GetInt32(1),
@@ -59,7 +38,6 @@ namespace library.Services
                     FechaDevolucion = reader.IsDBNull(5) ? null : reader.GetDateTime(5),
                     FechaVencimiento = reader.GetDateTime(6),
                     Estado = reader.GetString(7),
-
                     Usuario = new Usuario
                     {
                         IdUsuario = reader.GetInt32(1),
@@ -75,78 +53,53 @@ namespace library.Services
                         Portada = reader.IsDBNull(13) ? null : reader.GetString(13)
                     }
                 };
-
-                lista.Add(prestamo);
+                lista.Add(p);
             }
 
             return lista;
         }
 
-        /// <summary>
-        /// Devolver un libro prestado. Marca el préstamo como devuelto y libera el stock.
-        /// Si hay reservas pendientes → se asigna automáticamente.
-        /// </summary>
         public async Task DevolverPrestamoAsync(long idPrestamo)
         {
-            // 1. Buscar préstamo
-            var queryFind = @"SELECT id_usuario, id_libro, id_stock
-                              FROM prestamo
-                              WHERE id_prestamo=@id AND estado='activo'";
-            var paramFind = new[] { new NpgsqlParameter("@id", idPrestamo) };
+            var query = @"
+                UPDATE prestamo 
+                SET estado='devuelto', fecha_devolucion=now()
+                WHERE id_prestamo=@id AND estado='activo';";
 
-            int idUsuario = 0;
-            long idLibro = 0, idStock = 0;
-
-            using (var reader = await _conexion.ExecuteReaderAsync(queryFind, paramFind))
-            {
-                if (await reader.ReadAsync())
-                {
-                    idUsuario = reader.GetInt32(0);
-                    idLibro = reader.GetInt64(1);
-                    idStock = reader.GetInt64(2);
-                }
-                else
-                {
-                    throw new InvalidOperationException("❌ Préstamo no encontrado o ya devuelto.");
-                }
-            }
-
-            // 2. Marcar préstamo como devuelto
-            var queryUpdatePrestamo = @"UPDATE prestamo 
-                                        SET estado='devuelto', fecha_devolucion=now()
-                                        WHERE id_prestamo=@id";
-            await _conexion.ExecuteNonQueryAsync(queryUpdatePrestamo, paramFind);
-
-            // 3. Revisar lista de espera
-            var reservaService = new ReservaService();
-            var reserva = await reservaService.ObtenerPrimeraReservaPendiente(idLibro);
-
-            if (reserva != null)
-            {
-                // 3a. Notificar al usuario de la reserva
-                await reservaService.NotificarReservaAsync(reserva.IdReserva);
-
-                var notifService = new NotificacionService();
-                await notifService.CrearNotificacionAsync(
-                    reserva.IdUsuario,
-                    "📚 Libro disponible",
-                    "El libro que reservaste ya está disponible por devolución. Ven a recogerlo en las próximas 24h."
-                );
-
-                // 3b. Stock liberado se marca como reservado para esa reserva
-                var queryBloquear = "UPDATE stock SET disponibilidad=FALSE WHERE id_stock=@idStock";
-                await _conexion.ExecuteNonQueryAsync(queryBloquear, new[] {
-                    new NpgsqlParameter("@idStock", idStock)
-                });
-            }
-            else
-            {
-                // 3c. Si NO hay reservas → el stock vuelve a estar disponible
-                var queryLiberar = "UPDATE stock SET disponibilidad=TRUE WHERE id_stock=@idStock";
-                await _conexion.ExecuteNonQueryAsync(queryLiberar, new[] {
-                    new NpgsqlParameter("@idStock", idStock)
-                });
-            }
+            await _conexion.ExecuteNonQueryAsync(query, new[] {
+                new NpgsqlParameter("@id", idPrestamo)
+            });
         }
+
+        public async Task MarcarComoPerdidoAsync(long idPrestamo, string? motivo, decimal? monto)
+        {
+            var query = @"
+                UPDATE prestamo 
+                SET estado='perdido', fecha_devolucion=now()
+                WHERE id_prestamo=@id AND estado='activo';";
+
+            await _conexion.ExecuteNonQueryAsync(query, new[] {
+                new NpgsqlParameter("@id", idPrestamo)
+            });
+
+            // ⚙️ Los triggers fn_prestamo_perdido() manejarán automáticamente:
+            // - Multa
+            // - Notificación al usuario
+            // - Notificación al administrador
+        }
+
+        public async Task DevolverTodosAsync(int idUsuario)
+        {
+            var query = @"
+        UPDATE prestamo
+        SET estado='devuelto', fecha_devolucion=NOW()
+        WHERE id_usuario=@id
+          AND estado='activo';";
+
+            await _conexion.ExecuteNonQueryAsync(query, new[] {
+        new NpgsqlParameter("@id", idUsuario)
+    });
+        }
+
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace library.ViewModels
@@ -28,6 +29,8 @@ namespace library.ViewModels
 
         public IAsyncRelayCommand<Reserva?> StartLoanCommand { get; }
         public IAsyncRelayCommand<Reserva?> CancelReservationCommand { get; }
+        public IAsyncRelayCommand<Reserva?> MarkAsReadyCommand { get; }
+
 
         public OrdersViewModel()
         {
@@ -37,6 +40,7 @@ namespace library.ViewModels
 
             StartLoanCommand = new AsyncRelayCommand<Reserva?>(StartLoanAsync);
             CancelReservationCommand = new AsyncRelayCommand<Reserva?>(CancelReservationAsync);
+            MarkAsReadyCommand = new AsyncRelayCommand<Reserva?>(MarkAsReadyAsync);
 
             CargarReservasAsync();
         }
@@ -84,42 +88,10 @@ namespace library.ViewModels
             if (result is not LoanReservationDialogViewModel m)
                 return;
 
-            // Buscar stock disponible para el libro
-            var stockDisponible = await _stockService.ObtenerStockDisponibleAsync(r.IdLibro);
-            if (stockDisponible is null)
-            {
-                // ❌ No hay stock → se queda en lista de espera (reserva sigue pendiente)
-                await _notifService.CrearNotificacionAsync(
-                    r.IdUsuario,
-                    "⏳ Reserva en espera",
-                    $"El libro \"{r.Libro?.Titulo}\" está en lista de espera. Se te notificará cuando haya ejemplares disponibles."
-                );
-                return;
-            }
-
-            // Bloqueamos stock como prestado
-            await _stockService.MarcarComoPrestadoAsync(stockDisponible.IdStock);
-
-            // Creamos préstamo
-            await _prestamoService.CrearPrestamoAsync(
-            r.IdUsuario,
-            r.IdLibro,
-            stockDisponible.IdStock,
-            m.LoanStart,
-            m.DueDate
-        );
-
 
             // Actualizamos la reserva
             await _reservaService.CompletarReservaAsync(r.IdReserva);
-            r.Estado = "completada";
-
-            // Notificación al usuario
-            await _notifService.CrearNotificacionAsync(
-                r.IdUsuario,
-                "📚 Préstamo confirmado",
-                $"Has retirado el libro \"{r.Libro?.Titulo}\". Fecha de devolución: {m.DueDate:dd/MM/yyyy}"
-            );
+            r.Estado = "completado";
 
             OrdersView.Refresh();
         }
@@ -137,21 +109,27 @@ namespace library.ViewModels
 
             // Cambiamos estado en BD
             await _reservaService.CancelarReservaAsync(r.IdReserva);
-            r.Estado = "cancelada";
-
-            // Notificación al usuario
-            await _notifService.CrearNotificacionAsync(
-                r.IdUsuario,
-                "❌ Reserva cancelada",
-                $"Tu reserva del libro \"{r.Libro?.Titulo}\" ha sido cancelada."
-            );
-
-            // Liberar stock reservado (si existía)
-            var stockReservado = await _stockService.ObtenerStockReservadoPorUsuarioAsync(r.IdUsuario, r.IdLibro);
-            if (stockReservado is not null)
-                await _stockService.LiberarStockAsync(stockReservado.IdStock);
+            r.Estado = "Cancelado";
 
             OrdersView.Refresh();
         }
+
+        private async Task MarkAsReadyAsync(Reserva? r)
+        {
+            if (r is null) return;
+
+            var vm = new MarkAsReadyDialogViewModel(r);
+            var view = new MarkAsReadyDialog { DataContext = vm };
+
+            var result = await DialogHost.Show(view, "RootDialog");
+            if (result is not MarkAsReadyDialogViewModel)
+                return;
+
+            await _reservaService.MarcarReservaComoListaAsync(r.IdReserva);
+            r.Estado = "recoger";
+
+            OrdersView.Refresh();
+        }
+
     }
 }

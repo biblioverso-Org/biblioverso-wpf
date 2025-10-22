@@ -12,7 +12,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/Themes/CustomersTable.Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
             <converters:CountToVisibilityConverter x:Key="CountToVisibility" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -39,6 +38,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   behaviors:AdaptiveColumnsBehavior.Breakpoints="
                     1200:FechaReserva;
+                    1120:FechaExpiracion;
                     1000:Usuario.NombreCompleto;
                     900:Libro.Titulo;
                     820:Estado;"
@@ -47,12 +47,12 @@
                                        ConverterParameter=HasItems}">
 
             <DataGrid.Columns>
+
                 <!-- MIEMBRO -->
                 <DataGridTemplateColumn Header="MIEMBRO" Width="2*" SortMemberPath="Usuario.NombreCompleto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <!-- Avatar -->
                                 <Ellipse Width="32" Height="32" Margin="0,0,8,0">
                                     <Ellipse.Fill>
                                         <ImageBrush ImageSource="{Binding Usuario.Foto}" Stretch="UniformToFill"/>
@@ -84,9 +84,15 @@
                 </DataGridTemplateColumn>
 
                 <!-- FECHA DE RESERVA -->
-                <DataGridTextColumn Header="FECHA RESERVA"
+                <DataGridTextColumn Header="RESERVA" 
                                     SortMemberPath="FechaReserva"
                                     Binding="{Binding FechaReserva, StringFormat={}{0:dd/MM/yyyy}}"
+                                    Width="*" ElementStyle="{StaticResource CellTextCenter}" />
+
+                <!-- FECHA DE EXPIRACIÓN -->
+                <DataGridTextColumn Header="CANTIDAD" 
+                                    SortMemberPath="Cantidad"
+                                    Binding="{Binding Cantidad}"
                                     Width="*" ElementStyle="{StaticResource CellTextCenter}" />
 
                 <!-- ESTADO -->
@@ -111,23 +117,25 @@
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#2563EB"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#1E3A8A"/>
                                 </DataTrigger>
-
                                 <DataTrigger Binding="{Binding Estado}" Value="notificado">
                                     <Setter TargetName="chip" Property="Background" Value="#FCE7F3"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#DB2777"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#9D174D"/>
                                 </DataTrigger>
-
                                 <DataTrigger Binding="{Binding Estado}" Value="cancelada">
                                     <Setter TargetName="chip" Property="Background" Value="#FEE2E2"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#DC2626"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#7F1D1D"/>
                                 </DataTrigger>
-
                                 <DataTrigger Binding="{Binding Estado}" Value="completada">
                                     <Setter TargetName="chip" Property="Background" Value="#D1FAE5"/>
                                     <Setter TargetName="chip" Property="BorderBrush" Value="#059669"/>
                                     <Setter TargetName="chip" Property="TextElement.Foreground" Value="#064E3B"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Estado}" Value="espera">
+                                    <Setter TargetName="chip" Property="Background" Value="#FEF9C3"/>
+                                    <Setter TargetName="chip" Property="BorderBrush" Value="#EAB308"/>
+                                    <Setter TargetName="chip" Property="TextElement.Foreground" Value="#713F12"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -135,29 +143,111 @@
                 </DataGridTemplateColumn>
 
                 <!-- ACCIONES -->
-                <DataGridTemplateColumn Header="ACCIÓN" Width="180" CanUserSort="False">
+                <!-- ACCIONES -->
+                <DataGridTemplateColumn Header="ACCIÓN" Width="200" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <!-- Realizar préstamo -->
-                                <Button Style="{StaticResource GhostIconButton}"
-                                        ToolTip="Realizar préstamo"
-                                        Command="{Binding DataContext.StartLoanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}">
-                                    <mah:PackIconMaterial Kind="BookCheckOutline" Width="18" Height="18" Foreground="#6B7280"/>
+
+                                <Button x:Name="btnListo"
+        Style="{StaticResource GhostIconButton}"
+        ToolTip="Marcar como listo para recoger"
+        Command="{Binding DataContext.MarkAsReadyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="ClipboardCheckOutline" Width="18" Height="18" Foreground="#6B7280"/>
                                 </Button>
 
-                                <!-- Cancelar reserva -->
-                                <Button Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
-                                        ToolTip="Cancelar reserva"
-                                        Command="{Binding DataContext.CancelReservationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}">
+
+                                <!-- ✅ Marcar como completada -->
+                                <Button x:Name="btnCompletada"
+                        Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                        ToolTip="Marcar como completada"
+                        Command="{Binding DataContext.StartLoanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="CheckCircleOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
+
+                                <!-- ❌ Cancelar reserva -->
+                                <Button x:Name="btnCancelar"
+                        Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                        ToolTip="Cancelar reserva"
+                        Command="{Binding DataContext.CancelReservationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}">
                                     <mah:PackIconMaterial Kind="CloseCircleOutline" Width="18" Height="18" Foreground="#6B7280"/>
                                 </Button>
+
+                                <!-- 🔔 Notificar usuario -->
+                                <Button x:Name="btnNotificar"
+                        Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                        ToolTip="Notificar usuario"
+                        Command="{Binding DataContext.NotifyUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="BellOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
+
+                                <!-- 📄 Ver detalles -->
+                                <Button x:Name="btnDetalles"
+                        Style="{StaticResource GhostIconButton}" Margin="6,0,0,0"
+                        ToolTip="Ver detalles del préstamo"
+                        Command="{Binding DataContext.ViewDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}">
+                                    <mah:PackIconMaterial Kind="FileDocumentOutline" Width="18" Height="18" Foreground="#6B7280"/>
+                                </Button>
                             </StackPanel>
+
+                            <!-- Triggers que controlan la visibilidad -->
+                            <DataTemplate.Triggers>
+
+                                <!-- Estado: pendiente -->
+                                <DataTrigger Binding="{Binding Estado}" Value="pendiente">
+                                    <Setter TargetName="btnListo" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="btnCancelar" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+
+                                <!-- Estado: espera -->
+                                <DataTrigger Binding="{Binding Estado}" Value="espera">
+                                    <Setter TargetName="btnListo" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCancelar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+
+                                <!-- Estado: recoger -->
+                                <DataTrigger Binding="{Binding Estado}" Value="recoger">
+                                    <Setter TargetName="btnListo" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCancelar" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="btnCompletada" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+
+                                <!-- Estado: cancelado -->
+                                <DataTrigger Binding="{Binding Estado}" Value="cancelado">
+                                    <Setter TargetName="btnListo" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCancelar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+
+                                <!-- Estado: completado -->
+                                <DataTrigger Binding="{Binding Estado}" Value="completado">
+                                    <Setter TargetName="btnListo" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCancelar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnCompletada" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnNotificar" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="btnDetalles" Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
 
@@ -184,7 +274,6 @@
                        TextAlignment="Center"
                        TextWrapping="Wrap"
                        Margin="0,4,0,0"/>
-           
         </StackPanel>
     </Grid>
 </UserControl>

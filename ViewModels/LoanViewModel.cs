@@ -1,13 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using library.Dialogs;
 using library.Models;
 using library.Services;
-using MahApps.Metro.IconPacks;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace library.ViewModels
@@ -24,20 +26,24 @@ namespace library.ViewModels
         [ObservableProperty] private DateTime? dateFrom;
         [ObservableProperty] private DateTime? dateTo;
 
-        public ObservableCollection<DashStat> Stats { get; }
-        public IRelayCommand GenerateLoansReportCommand { get; }
+        // 🔹 Comandos principales
         public IAsyncRelayCommand<Prestamo?> MarkReturnedCommand { get; }
-        public IAsyncRelayCommand<Prestamo?> MarkOverdueCommand { get; }
+        public IAsyncRelayCommand<Prestamo?> MarkLostCommand { get; }
+        public IAsyncRelayCommand<Prestamo?> ShowInfoCommand { get; }
+        public IAsyncRelayCommand<int> ReturnAllCommand { get; }
 
         public LoanViewModel()
         {
             _prestamoService = new PrestamoService();
-
             Loans = new ObservableCollection<Prestamo>();
             LoansView = CollectionViewSource.GetDefaultView(Loans);
             LoansView.Filter = FilterLoan;
 
-       
+            MarkReturnedCommand = new AsyncRelayCommand<Prestamo?>(MarkReturnedAsync);
+            MarkLostCommand = new AsyncRelayCommand<Prestamo?>(MarkLostAsync);
+            ShowInfoCommand = new AsyncRelayCommand<Prestamo?>(ShowInfoAsync);
+            ReturnAllCommand = new AsyncRelayCommand<int>(ReturnAllAsync);
+
             _ = CargarPrestamosAsync();
         }
 
@@ -49,15 +55,18 @@ namespace library.ViewModels
             foreach (var p in prestamos)
                 Loans.Add(p);
 
-            ActualizarStats();
+            // ✅ Agrupación por usuario
+            var view = (ListCollectionView)CollectionViewSource.GetDefaultView(Loans);
+            view.GroupDescriptions.Clear();
+            view.GroupDescriptions.Add(new PropertyGroupDescription("Usuario.NombreCompleto"));
+            view.SortDescriptions.Clear();
+            view.SortDescriptions.Add(new SortDescription("Usuario.NombreCompleto", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription("FechaPrestamo", ListSortDirection.Descending));
+
             LoansView.Refresh();
         }
 
-        private void ActualizarStats()
-        {
-        }
-
-        // ====================== Filtros ======================
+        // ====================== Filtro ======================
         private bool FilterLoan(object obj)
         {
             if (obj is not Prestamo p) return false;
@@ -83,24 +92,106 @@ namespace library.ViewModels
             return true;
         }
 
-        // ====================== Marcar como devuelto ======================
+        // ====================== Ver información ======================
+        private async Task ShowInfoAsync(Prestamo? p)
+        {
+            if (p is null) return;
+
+            try
+            {
+                var dialog = new LoanInfoDialog { DataContext = p };
+                await DialogHost.Show(dialog, "RootDialog");
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"❌ Error al mostrar información:\n{ex.Message}");
+            }
+        }
+
+        // ====================== Devolver un libro ======================
         private async Task MarkReturnedAsync(Prestamo? p)
         {
-            
+            if (p is null) return;
+
+            try
+            {
+                // 🟦 Abre diálogo de devolución
+                var dialogVm = new LoanReturnDialogViewModel(p);
+                var dialog = new LoanReturnDialog { DataContext = dialogVm };
+                var result = await DialogHost.Show(dialog, "RootDialog");
+
+                if (result is Prestamo)
+                {
+                    await _prestamoService.DevolverPrestamoAsync(p.IdPrestamo);
+                    p.Estado = "devuelto";
+                    LoansView.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"⚠️ Error al devolver el libro:\n{ex.Message}");
+            }
         }
 
-        // ====================== Marcar como vencido ======================
-        private async Task MarkOverdueAsync(Prestamo? p)
+
+        // ====================== Marcar como perdido ======================
+        private async Task MarkLostAsync(Prestamo? p)
         {
+            if (p is null) return;
+
+            try
+            {
+                var vm = new LoanLostDialogViewModel(p);
+                var dialog = new LoanLostDialog { DataContext = vm };
+                var result = await DialogHost.Show(dialog, "RootDialog");
+
+                if (result is Prestamo)
+                {
+                    await _prestamoService.MarcarComoPerdidoAsync(p.IdPrestamo, vm.Motivo, vm.Monto);
+                    p.Estado = "perdido";
+                    LoansView.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"⚠️ Error al marcar el préstamo como perdido:\n{ex.Message}");
+            }
         }
 
-        // ====================== Reporte ======================
-        private void GenerateReport()
+        // ====================== Devolver todos del usuario ======================
+        private async Task ReturnAllAsync(int idUsuario)
         {
-            System.Windows.MessageBox.Show($"📊 Reporte generado con {Loans.Count} préstamos.");
+            try
+            {
+                var prestamosUsuario = Loans.Where(p => p.IdUsuario == idUsuario && p.Estado == "activo").ToList();
+
+                if (!prestamosUsuario.Any())
+                {
+                    MessageBox.Show("No hay préstamos activos para este usuario.");
+                    return;
+                }
+
+                var confirm = MessageBox.Show(
+                    $"¿Deseas devolver los {prestamosUsuario.Count} préstamos activos de este usuario?",
+                    "Confirmar devolución", MessageBoxButton.YesNo);
+
+                if (confirm != MessageBoxResult.Yes) return;
+
+                await _prestamoService.DevolverTodosAsync(idUsuario);
+
+                foreach (var p in prestamosUsuario)
+                    p.Estado = "devuelto";
+
+                LoansView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"⚠️ Error al devolver todos:\n{ex.Message}");
+            }
         }
 
-        // ====================== Hooks para filtros ======================
+
+        // ====================== Refresh automáticos ======================
         partial void OnSearchTextChanged(string? value) => LoansView.Refresh();
         partial void OnStatusChanged(string value) => LoansView.Refresh();
         partial void OnDateFromChanged(DateTime? value) => LoansView.Refresh();

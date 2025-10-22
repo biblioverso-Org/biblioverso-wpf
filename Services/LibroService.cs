@@ -282,7 +282,7 @@ namespace library.Services
                         if (reserva != null)
                         {
                             // 1. Cambiar reserva a notificada
-                            await reservaService.NotificarReservaAsync(reserva.IdReserva);
+                            await reservaService.RecogerReservaAsync(reserva.IdReserva);
 
                             // 2. Crear notificación
                             var notifService = new NotificacionService();

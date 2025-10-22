@@ -28,10 +28,11 @@ namespace library.Services
             return (long)(await _conexion.ExecuteScalarAsync(query, param))!;
         }
 
+
         public async Task<List<Reserva>> ObtenerReservasAsync()
         {
             var query = @"
-        SELECT r.id_reserva, r.id_usuario, r.id_libro, r.fecha_reserva, r.estado,
+        SELECT r.id_reserva, r.id_usuario, r.id_libro, r.fecha_reserva, r.estado, r.cantidad,
                u.nombre, u.apellido, u.usuario, u.foto,
                l.titulo, l.portada
         FROM reserva r
@@ -52,20 +53,21 @@ namespace library.Services
                     IdLibro = reader.GetInt64(2),
                     FechaReserva = reader.GetDateTime(3),
                     Estado = reader.GetString(4),
+                    Cantidad = reader.IsDBNull(5) ? 1 : reader.GetInt32(5), // ✅ cantidad correcta
 
                     Usuario = new Usuario
                     {
                         IdUsuario = reader.GetInt32(1),
-                        Nombre = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                        Apellido = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                        UserName = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                        Foto = reader.IsDBNull(8) ? null : reader.GetString(8)
+                        Nombre = reader.IsDBNull(6) ? "" : reader.GetString(6),
+                        Apellido = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                        UserName = reader.IsDBNull(8) ? "" : reader.GetString(8),
+                        Foto = reader.IsDBNull(9) ? null : reader.GetString(9)
                     },
                     Libro = new Libro
                     {
                         IdLibro = reader.GetInt64(2),
-                        Titulo = reader.IsDBNull(9) ? "" : reader.GetString(9),
-                        Portada = reader.IsDBNull(10) ? null : reader.GetString(10)
+                        Titulo = reader.IsDBNull(10) ? "" : reader.GetString(10),
+                        Portada = reader.IsDBNull(11) ? null : reader.GetString(11)
                     }
                 };
 
@@ -74,6 +76,7 @@ namespace library.Services
 
             return lista;
         }
+
 
         /// <summary>
         /// Obtiene la primera reserva pendiente para un libro (orden FIFO).
@@ -106,10 +109,10 @@ namespace library.Services
         /// <summary>
         /// Marca la reserva como "notificado".
         /// </summary>
-        public async Task NotificarReservaAsync(long idReserva)
+        public async Task RecogerReservaAsync(long idReserva)
         {
             var query = @"UPDATE reserva
-                          SET estado='notificado'
+                          SET estado='recoger'
                           WHERE id_reserva=@id";
             var param = new[] { new NpgsqlParameter("@id", idReserva) };
             await _conexion.ExecuteNonQueryAsync(query, param);
@@ -121,7 +124,7 @@ namespace library.Services
         public async Task CompletarReservaAsync(long idReserva)
         {
             var query = @"UPDATE reserva
-                          SET estado='completada'
+                          SET estado='completado'
                           WHERE id_reserva=@id";
             var param = new[] { new NpgsqlParameter("@id", idReserva) };
             await _conexion.ExecuteNonQueryAsync(query, param);
@@ -133,8 +136,17 @@ namespace library.Services
         public async Task CancelarReservaAsync(long idReserva)
         {
             var query = @"UPDATE reserva
-                          SET estado='cancelada'
+                          SET estado='cancelado'
                           WHERE id_reserva=@id";
+            var param = new[] { new NpgsqlParameter("@id", idReserva) };
+            await _conexion.ExecuteNonQueryAsync(query, param);
+        }
+
+        public async Task MarcarReservaComoListaAsync(long idReserva)
+        {
+            var query = @"UPDATE reserva
+                  SET estado='recoger'
+                  WHERE id_reserva=@id";
             var param = new[] { new NpgsqlParameter("@id", idReserva) };
             await _conexion.ExecuteNonQueryAsync(query, param);
         }
