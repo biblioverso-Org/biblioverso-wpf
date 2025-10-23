@@ -131,6 +131,38 @@
                                    FontWeight="Bold" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding Sinopsis}" Height="150"
                                  AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                        <!-- Bloque 5: PDF Digital -->
+                        <TextBlock Text="📄 Versión digital (opcional)" 
+           FontWeight="Bold" Margin="0,6,0,4"/>
+
+                        <StackPanel Orientation="Vertical" Margin="0,0,0,8">
+                            <TextBox Text="{Binding PdfLocalPath}" Width="220"
+             IsReadOnly="True"
+             materialDesign:HintAssist.Hint="Seleccionar archivo PDF..."/>
+
+                            <Button Margin="8,0,0,0" Padding="8,4"
+            Command="{Binding SelectPdfCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <mah:PackIconMaterial Kind="FilePdfBox" Width="18" Height="18" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Buscar"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Margin="8,0,0,0" Padding="8,4"
+            Command="{Binding UploadPdfCommand}"
+            IsEnabled="{Binding IsPdfReady}">
+                                <StackPanel Orientation="Horizontal">
+                                    <mah:PackIconMaterial Kind="CloudUploadOutline" Width="18" Height="18" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Subir"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding PdfStatus}"
+           FontSize="12"
+           Foreground="{DynamicResource App.TextSecondaryBrush}"/>
+
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

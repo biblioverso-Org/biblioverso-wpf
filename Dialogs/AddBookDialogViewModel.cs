@@ -16,7 +16,7 @@ namespace library.Dialogs.AddBook
     {
         private readonly GoogleBooksService _googleBooks = new();
         private readonly CategoriaService _categoriaService = new();
-
+        [ObservableProperty] private bool isLoading;
         [ObservableProperty] private int stepIndex = 0;
         public bool IsStepSearch => StepIndex == 0;
         public bool IsStepDetails => StepIndex == 1;
@@ -29,6 +29,13 @@ namespace library.Dialogs.AddBook
             OnPropertyChanged(nameof(IsStepDistribution));
             OnPropertyChanged(nameof(CanSave));
         }
+
+        // ======= PDF Digital =======
+        [ObservableProperty] private string? pdfLocalPath;
+        [ObservableProperty] private string? pdfUrl;
+        // Nombre del archivo para mostrar en UI
+        public string? PdfFileName => string.IsNullOrEmpty(PdfLocalPath) ? null : System.IO.Path.GetFileName(PdfLocalPath);
+
 
         // ======= Campos de Libro =======
         [ObservableProperty] private string? titulo;
@@ -61,7 +68,10 @@ namespace library.Dialogs.AddBook
         partial void OnDistDamagedChanged(int value) => UpdateDistribution();
         partial void OnDistRepairedChanged(int value) => UpdateDistribution();
         partial void OnDistRestoringChanged(int value) => UpdateDistribution();
-
+        partial void OnPdfLocalPathChanged(string? value)
+        {
+            OnPropertyChanged(nameof(PdfFileName));
+        }
         private void UpdateDistribution()
         {
             OnPropertyChanged(nameof(DistTotal));
@@ -108,6 +118,56 @@ namespace library.Dialogs.AddBook
             foreach (var c in cats) Categorias.Add(c);
         }
 
+        [RelayCommand]
+        private void CreateManualBook()
+        {
+            // Limpia los datos previos
+            Titulo = string.Empty;
+            AutoresTexto = string.Empty;
+            Isbn = string.Empty;
+            Editorial = string.Empty;
+            Sinopsis = string.Empty;
+            Portada = null;
+            Rating = 0;
+            FechaPublicacion = DateTime.Now;
+            Stock = 1;
+            SelectedCategoriaId = null;
+
+            StepIndex = 1; // Ir al paso Detalles
+        }
+
+        [RelayCommand]
+        private void SelectPdf()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Archivos PDF (*.pdf)|*.pdf",
+                Title = "Seleccionar archivo PDF"
+            };
+
+            if (dialog.ShowDialog() == true)
+                PdfLocalPath = dialog.FileName;
+        }
+
+        // ✅ Subida y conversión del PDF antes de guardar
+        public async Task<string?> UploadPdfIfNeededAsync()
+        {
+            if (string.IsNullOrEmpty(PdfLocalPath))
+                return null;
+
+            try
+            {
+                var cloud = new CloudinaryService("dvw5h3ccw", "893598289963378", "mKNQQGTlypYx947y0F72jpnzb88");
+                return await cloud.UploadPdfAsync(PdfLocalPath, "libros_pdf");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al subir PDF: {ex.Message}");
+                return null;
+            }
+        }
+
+
         private async Task LoadInitialSuggestionsAsync()
         {
             var results = await _googleBooks.SearchAsync("popular books");
@@ -137,11 +197,24 @@ namespace library.Dialogs.AddBook
         private async Task SearchBooksAsync(string query)
         {
             if (string.IsNullOrWhiteSpace(query)) return;
-            var results = await _googleBooks.SearchAsync(query);
 
+            IsLoading = true;
             Suggestions.Clear();
-            foreach (var r in results) Suggestions.Add(r);
-            SuggestionsView.Refresh();
+
+            try
+            {
+                var results = await _googleBooks.SearchAsync(query);
+                foreach (var r in results) Suggestions.Add(r);
+            }
+            catch (Exception)
+            {
+                // Silencioso, mantiene UI estable
+            }
+            finally
+            {
+                IsLoading = false;
+                SuggestionsView.Refresh();
+            }
         }
 
         [RelayCommand]
@@ -184,8 +257,10 @@ namespace library.Dialogs.AddBook
         }
 
         // ✅ Conversión de ViewModel → Libro (para guardarlo en DB)
-        public Libro ToLibro()
+        public async Task<Libro> ToLibroAsync()
         {
+            string? uploadedPdf = await UploadPdfIfNeededAsync();
+
             var libro = new Libro
             {
                 Titulo = Titulo ?? string.Empty,
@@ -195,6 +270,7 @@ namespace library.Dialogs.AddBook
                 FechaPublicacion = FechaPublicacion,
                 Portada = Portada,
                 Sinopsis = Sinopsis,
+                PdfUrl = uploadedPdf,
                 FechaCreacion = DateTime.UtcNow,
                 FechaActualizacion = DateTime.UtcNow,
                 Autores = string.IsNullOrWhiteSpace(AutoresTexto)

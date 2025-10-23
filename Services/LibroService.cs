@@ -115,8 +115,9 @@ namespace library.Services
         // ==================== INSERTAR SIMPLE ====================
         public async Task<int> AddLibroAsync(Libro libro)
         {
-            var query = @"INSERT INTO libro (isbn, titulo, portada, sinopsis, id_categoria, editorial, fecha_publicacion) 
-                  VALUES (@isbn, @titulo, @portada, @sinopsis, @idCategoria, @editorial, @fecha)";
+            var query = @"INSERT INTO libro (isbn, titulo, portada, sinopsis, id_categoria, editorial, fecha_publicacion, pdf_url) 
+              VALUES (@isbn, @titulo, @portada, @sinopsis, @idCategoria, @editorial, @fecha, @pdfUrl)";
+
             var parameters = new[]
             {
         new NpgsqlParameter("@isbn", libro.ISBN),
@@ -125,7 +126,9 @@ namespace library.Services
         new NpgsqlParameter("@sinopsis", (object?)libro.Sinopsis ?? DBNull.Value),
         new NpgsqlParameter("@idCategoria", (object?)libro.IdCategoria ?? DBNull.Value),
         new NpgsqlParameter("@editorial", (object?)libro.Editorial ?? DBNull.Value),
-        new NpgsqlParameter("@fecha", (object?)libro.FechaPublicacion ?? DBNull.Value)
+        new NpgsqlParameter("@fecha", (object?)libro.FechaPublicacion ?? DBNull.Value),
+        new NpgsqlParameter("@pdfUrl", (object?)libro.PdfUrl ?? DBNull.Value)
+
     };
             return await _conexion.ExecuteNonQueryAsync(query, parameters);
         }
@@ -134,21 +137,23 @@ namespace library.Services
         public async Task<int> AddLibroCompletoAsync(Libro libro)
         {
             // 1. Insertar libro y obtener ID
-            var queryLibro = @"INSERT INTO libro (isbn, titulo, portada, sinopsis, id_categoria, editorial, fecha_publicacion, fecha_creacion, fecha_actualizacion) 
-                               VALUES (@isbn, @titulo, @portada, @sinopsis, @idCategoria, @editorial, @fecha_pub, @creacion, @actualizacion)
-                               RETURNING id_libro";
+            var queryLibro = @"INSERT INTO libro (isbn, titulo, portada, sinopsis, id_categoria, editorial, fecha_publicacion, pdf_url, fecha_creacion, fecha_actualizacion) 
+                   VALUES (@isbn, @titulo, @portada, @sinopsis, @idCategoria, @editorial, @fecha_pub, @pdfUrl, @creacion, @actualizacion)
+                   RETURNING id_libro";
+
             var parametersLibro = new[]
-            {
-                new NpgsqlParameter("@isbn", libro.ISBN),
-                new NpgsqlParameter("@titulo", libro.Titulo),
-                new NpgsqlParameter("@portada", (object?)libro.Portada ?? DBNull.Value),
-                new NpgsqlParameter("@sinopsis", (object?)libro.Sinopsis ?? DBNull.Value),
-                new NpgsqlParameter("@idCategoria", (object?)libro.IdCategoria ?? DBNull.Value),
-                new NpgsqlParameter("@editorial", (object?)libro.Editorial ?? DBNull.Value),
-                new NpgsqlParameter("@fecha_pub", (object?)libro.FechaPublicacion ?? DBNull.Value),
-                new NpgsqlParameter("@creacion", DateTime.UtcNow),
-                new NpgsqlParameter("@actualizacion", DateTime.UtcNow)
-            };
+ {
+    new NpgsqlParameter("@isbn", libro.ISBN),
+    new NpgsqlParameter("@titulo", libro.Titulo),
+    new NpgsqlParameter("@portada", (object?)libro.Portada ?? DBNull.Value),
+    new NpgsqlParameter("@sinopsis", (object?)libro.Sinopsis ?? DBNull.Value),
+    new NpgsqlParameter("@idCategoria", (object?)libro.IdCategoria ?? DBNull.Value),
+    new NpgsqlParameter("@editorial", (object?)libro.Editorial ?? DBNull.Value),
+    new NpgsqlParameter("@fecha_pub", (object?)libro.FechaPublicacion ?? DBNull.Value),
+    new NpgsqlParameter("@pdfUrl", (object?)libro.PdfUrl ?? DBNull.Value),
+    new NpgsqlParameter("@creacion", DateTime.UtcNow),
+    new NpgsqlParameter("@actualizacion", DateTime.UtcNow)
+};
 
             var idLibro = (long)(await _conexion.ExecuteScalarAsync(queryLibro, parametersLibro))!;
            
@@ -215,13 +220,14 @@ namespace library.Services
         public async Task<int> UpdateLibroAsync(Libro libro)
         {
             var query = @"UPDATE libro 
-                  SET titulo=@titulo, 
-                      sinopsis=@sinopsis, 
-                      id_categoria=@idCategoria, 
-                      editorial=@editorial, 
-                      portada=@portada, 
-                      fecha_actualizacion=@fecha_actualizacion 
-                  WHERE id_libro=@id";
+              SET titulo=@titulo, 
+                  sinopsis=@sinopsis, 
+                  id_categoria=@idCategoria, 
+                  editorial=@editorial, 
+                  portada=@portada, 
+                  pdf_url=@pdfUrl, 
+                  fecha_actualizacion=@fecha_actualizacion 
+              WHERE id_libro=@id";
 
             var parameters = new[]
             {
@@ -231,7 +237,9 @@ namespace library.Services
         new NpgsqlParameter("@editorial", (object?)libro.Editorial ?? DBNull.Value),
         new NpgsqlParameter("@portada", (object?)libro.Portada ?? DBNull.Value),
         new NpgsqlParameter("@fecha_actualizacion", DateTime.UtcNow),
-        new NpgsqlParameter("@id", libro.IdLibro)
+        new NpgsqlParameter("@id", libro.IdLibro),
+        new NpgsqlParameter("@pdfUrl", (object?)libro.PdfUrl ?? DBNull.Value),
+
     };
 
             return await _conexion.ExecuteNonQueryAsync(query, parameters);

@@ -1,9 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using library.Models;
+using library.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace library.Dialogs
 {
@@ -12,6 +13,12 @@ namespace library.Dialogs
         [ObservableProperty] private string? titulo;
         [ObservableProperty] private string? autoresTexto;
         [ObservableProperty] private string? isbn;
+
+        // ====== PDF Digital ======
+        [ObservableProperty] private string? pdfUrl;       // URL en BD
+        [ObservableProperty] private string? pdfLocalPath; // ruta local seleccionada
+        [ObservableProperty] private string? pdfStatus;
+        [ObservableProperty] private bool isPdfReady;
 
         // Nuevo: categoría normalizada
         [ObservableProperty] private int? selectedCategoriaId;
@@ -34,9 +41,19 @@ namespace library.Dialogs
             !string.IsNullOrWhiteSpace(Titulo) &&
             !string.IsNullOrWhiteSpace(Isbn);
 
+        public string? PdfFileName =>
+    string.IsNullOrEmpty(PdfLocalPath) ? null : System.IO.Path.GetFileName(PdfLocalPath);
+
+
         partial void OnTituloChanged(string? v) => OnPropertyChanged(nameof(IsValid));
         partial void OnIsbnChanged(string? v) => OnPropertyChanged(nameof(IsValid));
-
+       
+        partial void OnPdfLocalPathChanged(string? value)
+        {
+            OnPropertyChanged(nameof(PdfFileName));
+            IsPdfReady = !string.IsNullOrEmpty(value);
+            PdfStatus = null;
+        }
         // Cuando cambia la portada
         partial void OnPortadaUrlChanged(string? v) => OnPropertyChanged(nameof(PortadaUrl));
 
@@ -68,6 +85,52 @@ namespace library.Dialogs
             Portada = null;
         }
 
+        [RelayCommand]
+        private void SelectPdf()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Archivos PDF (*.pdf)|*.pdf",
+                Title = "Seleccionar archivo PDF"
+            };
+
+            if (dialog.ShowDialog() == true)
+                PdfLocalPath = dialog.FileName;
+        }
+
+        [RelayCommand]
+        private async Task UploadPdfAsync()
+        {
+            if (string.IsNullOrEmpty(PdfLocalPath) || !System.IO.File.Exists(PdfLocalPath))
+            {
+                PdfStatus = "⚠️ Selecciona un archivo PDF primero.";
+                return;
+            }
+
+            try
+            {
+                PdfStatus = "☁️ Subiendo PDF...";
+                var cloud = new CloudinaryService("dvw5h3ccw", "893598289963378", "mKNQQGTlypYx947y0F72jpnzb88");
+                var uploaded = await cloud.UploadPdfAsync(PdfLocalPath, "libros_pdf");
+
+                if (!string.IsNullOrEmpty(uploaded))
+                {
+                    PdfUrl = uploaded;
+                    PdfStatus = "✅ PDF subido correctamente.";
+                    IsPdfReady = false;
+                }
+                else
+                {
+                    PdfStatus = "❌ Error al subir el PDF.";
+                }
+            }
+            catch (Exception ex)
+            {
+                PdfStatus = $"❌ Error: {ex.Message}";
+            }
+        }
+
+
         // ====== Mappers ======
         public static EditBookDialogViewModel FromLibro(Libro l) => new()
         {
@@ -79,6 +142,7 @@ namespace library.Dialogs
             Portada = l.Portada,
             PortadaUrl = l.Portada,
             Sinopsis = l.Sinopsis,
+            PdfUrl = l.PdfUrl,
             Rating = l.Opiniones.Any() ? l.Opiniones.Average(o => o.Calificacion) : 0,
             Disponible = l.Stocks.Any(s => s.Disponibilidad),
             SelectedCategoriaId = l.IdCategoria, // ✅ categoría

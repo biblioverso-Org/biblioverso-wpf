@@ -130,13 +130,13 @@ namespace library.ViewModels
             var result = await DialogHost.Show(view, "RootDialog");
             if (result is AddBookDialogViewModel m)
             {
-                var nuevo = m.ToLibro();
+                var nuevo = await m.ToLibroAsync(); // ✅ ahora es asíncrono
                 await _service.AddLibroCompletoAsync(nuevo);
+
                 await LoadLibrosAsync();
             }
         }
 
-        // ===================== Editar libro =====================
         private async Task EditBookAsync(Libro? l)
         {
             if (l is null) return;
@@ -149,23 +149,30 @@ namespace library.ViewModels
             if (result is EditBookDialogViewModel m)
             {
                 var cloudService = new CloudinaryService(
-                    "dvw5h3ccw", // tu cloud name
-                    "893598289963378", // tu API key
-                    "mKNQQGTlypYx947y0F72jpnzb88" // tu API secret
+                    "dvw5h3ccw", // Cloud name
+                    "893598289963378", // API key
+                    "mKNQQGTlypYx947y0F72jpnzb88" // API secret
                 );
 
                 string? portadaUrl = l.Portada;
+                string? pdfUrl = l.PdfUrl;
 
-                // 📌 Solo si cargó nueva imagen local
+                // 📸 Subir nueva portada (si cambió)
                 if (!string.IsNullOrEmpty(m.PortadaUrl) && System.IO.File.Exists(m.PortadaUrl))
                     portadaUrl = await cloudService.UploadImageAsync(m.PortadaUrl);
 
+                // 📄 Subir nuevo PDF (si seleccionó uno nuevo)
+                if (!string.IsNullOrEmpty(m.PdfLocalPath) && System.IO.File.Exists(m.PdfLocalPath))
+                    pdfUrl = await cloudService.UploadPdfAsync(m.PdfLocalPath, "libros_pdf");
+
+                // ✅ Actualizar datos
                 l.Titulo = m.Titulo ?? l.Titulo;
                 l.ISBN = m.Isbn ?? l.ISBN;
                 l.Editorial = m.Editorial ?? l.Editorial;
                 l.FechaPublicacion = m.FechaPublicacion ?? l.FechaPublicacion;
                 l.Sinopsis = m.Sinopsis ?? l.Sinopsis;
                 l.Portada = portadaUrl;
+                l.PdfUrl = pdfUrl;
                 l.IdCategoria = m.SelectedCategoriaId > 0 ? m.SelectedCategoriaId : l.IdCategoria;
 
                 if (!string.IsNullOrWhiteSpace(m.AutoresTexto))
@@ -180,7 +187,7 @@ namespace library.ViewModels
                 await LoadLibrosAsync();
             }
         }
-
+ 
         private void GenerateReport()
         {
             MessageBox.Show($"📊 Reporte generado con {Libros.Count} libros.");

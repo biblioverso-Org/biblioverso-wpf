@@ -24,6 +24,7 @@ namespace library.Models
         public DateTime? FechaActualizacion { get; set; }
         public bool Eliminado { get; set; } = false;
 
+        public string? PdfUrl { get; set; }
 
         // Relaciones
         public List<Autor> Autores { get; set; } = new();

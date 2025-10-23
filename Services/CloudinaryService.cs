@@ -30,5 +30,22 @@ namespace library.Services
 
             return uploadResult?.SecureUrl?.ToString();
         }
+
+        public async Task<string?> UploadPdfAsync(string localPath, string folder = "libros_pdf")
+        {
+            if (string.IsNullOrEmpty(localPath)) return null;
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(localPath),
+                Folder = folder
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            return uploadResult?.SecureUrl?.ToString();
+        }
+
+
+
     }
 }

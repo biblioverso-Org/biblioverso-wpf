@@ -153,6 +153,28 @@
                             <TextBlock Text="📝 Sinopsis" FontWeight="Bold" Margin="0,6,0,6"/>
                             <TextBox Text="{Binding Sinopsis}" Height="120"
                          AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                            <!-- Bloque 6: PDF Digital -->
+                            <TextBlock Text="📄 Versión digital (opcional)" FontWeight="Bold" Margin="0,8,0,6"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding PdfLocalPath}" Width="260" 
+             IsReadOnly="True" 
+             materialDesign:HintAssist.Hint="Seleccionar archivo PDF..."/>
+                                <Button Margin="8,0,0,0" Padding="8,4"
+            Command="{Binding SelectPdfCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <mah:PackIconMaterial Kind="FilePdfBox" Width="18" Height="18" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Buscar"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- Mostrar nombre de archivo subido -->
+                            <TextBlock Text="{Binding PdfFileName}"
+           FontSize="12"
+           Foreground="{DynamicResource App.TextSecondaryBrush}"
+           Margin="0,4,0,8"/>
+
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
@@ -352,6 +374,7 @@
 
             <!-- Contenido -->
             <materialDesign:Transitioner Grid.Row="2" SelectedIndex="{Binding StepIndex}">
+                <!-- solo muestro el cambio del paso 1 -->
                 <materialDesign:TransitionerSlide>
                     <!-- Paso 1 -->
                     <Grid>
@@ -362,8 +385,8 @@
 
                         <!-- Buscador -->
                         <Border Grid.Row="0" CornerRadius="10" Padding="12" Margin="0,0,0,10"
-                    Background="{DynamicResource App.ElevatedBrush}"
-                    BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1">
+                Background="{DynamicResource App.ElevatedBrush}"
+                BorderBrush="{DynamicResource App.DividerBrush}" BorderThickness="1">
                             <DockPanel LastChildFill="True">
                                 <mah:PackIconMaterial Kind="Magnify" Width="20" Height="20" Margin="0,0,8,0"/>
                                 <TextBox BorderThickness="0" Background="Transparent"
@@ -373,22 +396,68 @@
                             </DockPanel>
                         </Border>
 
-                        <!-- Lista -->
-                        <ListBox Grid.Row="1"
-                     ItemsSource="{Binding SuggestionsView}"
+                        <!-- Contenedor con loader + lista -->
+                        <Grid Grid.Row="1">
+
+                            <!-- Lista -->
+                            <ListBox ItemsSource="{Binding SuggestionsView}"
                      ItemTemplate="{StaticResource SuggestionCardTemplate}"
                      BorderThickness="0" Background="Transparent"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="Padding" Value="0"/>
-                                    <Setter Property="Focusable" Value="False"/>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                        </ListBox>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Focusable" Value="False"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+
+                                <!-- fade in -->
+                                <ListBox.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="0" To="1" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </ListBox.Triggers>
+                            </ListBox>
+
+                            <!-- Loader overlay -->
+                            <Grid Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                                <Border Background="#80000000" CornerRadius="10"/>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ProgressBar Width="160" Height="6" IsIndeterminate="True"
+                                 Foreground="{DynamicResource App.PrimaryBrush}"/>
+                                    <TextBlock Text="Buscando libros..."
+                               Foreground="White"
+                               FontWeight="SemiBold"
+                               FontSize="13"
+                               Margin="0,8,0,0"
+                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Agregar manualmente -->
+                            <StackPanel VerticalAlignment="Bottom" Margin="0,16,0,0" HorizontalAlignment="Center">
+                                <TextBlock Text="¿No encontraste el libro?"
+                           FontSize="13"
+                           Foreground="{DynamicResource App.TextSecondaryBrush}"
+                           HorizontalAlignment="Center"/>
+                                <Button Margin="0,8,0,0" Padding="12,6"
+                        Command="{Binding CreateManualBookCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <mah:PackIconMaterial Kind="BookPlusOutline" Width="18" Height="18" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Agregar manualmente"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </materialDesign:TransitionerSlide>
+
 
                 <!-- Paso 2 -->
                 <materialDesign:TransitionerSlide>
